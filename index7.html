@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Martin Wöllenstein</title>
+  <style>
+    /* @font-face {
+  font-family: 'Unica';
+  src: url('./HGKBUnica77VIPBeta.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 800;
+} */
+    @font-face {
+      font-family: 'Source';
+      src: url('.SourceSerifVariable.otf') format('opentype');
+      font-style: normal;
+      font-weight: 200;
+    }
+
+    :root {
+      --font-ui: 'Unica', sans-serif;
+      /* navigation, labels, titles */
+      --font-body: 'Source', serif;
+      /* project text blocks */
+
+      --fv-ui: 'wght' 200;
+      /* Unica variable weight */
+
+      --size-ui: 24px;
+      /* nav, titles, tags, project rows */
+      --size-label: 16px;
+      /* small block-title labels (e.g. "Intro", "Role") */
+      --size-body: 24px;
+      /* body text inside projects */
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      color: #000;
+      background: #fff;
+    }
+
+    /* ── LAYOUT ── */
+    #shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .col {
+      overflow-y: auto;
+      flex-shrink: 0;
+      transition: width 0.25s ease;
+    }
+
+    #col-1 {
+      width: 33%;
+      border-right: 1px solid #000;
+    }
+
+    #col-2 {
+      width: 67%;
+    }
+
+    #col-1.split {
+      width: 33%;
+    }
+
+    #col-2.split {
+      width: 67%;
+    }
+
+    /* resize handle */
+    .handle {
+      width: 10px;
+      flex-shrink: 0;
+      cursor: col-resize;
+      background: transparent;
+      /* border-right: 1px solid #000; */
+      display: block;
+      z-index: 10;
+    }
+
+    /* ── COL-1 ── */
+    #col-1-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #col-1-header {
+      padding: 25px 25px 15px 25px;
+    }
+
+    #site-title {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      line-height: 1.1;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    #site-title:hover {
+      opacity: 0.5;
+    }
+
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      font-style: normal;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: #000;
+      transition: font-style 0.15s;
+    }
+
+    .tag:hover {
+      font-style: italic;
+    }
+
+    .tag.active {
+      font-style: italic;
+    }
+
+    /* project rows */
+    .proj-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 25px;
+      border-bottom: 1px solid #000;
+      cursor: pointer;
+    }
+
+    .proj-row:first-child {
+      border-top: 1px solid #000;
+    }
+
+    .proj-row:hover {
+      background: #f5f5f5;
+    }
+
+    .proj-row.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .proj-name {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+    }
+
+    .proj-year {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+    }
+
+    .proj-row.active .proj-year {
+      color: #fff;
+    }
+
+    /* ── COL-2 ── */
+
+    /* top bar inside col-2 */
+    #case-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 25px 25px 15px 25px;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 5;
+    }
+
+    #case-title {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+    }
+
+    #case-filters {
+      display: flex;
+      gap: 16px;
+    }
+
+    .case-filter {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      font-style: normal;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: #000;
+      transition: font-style 0.15s;
+    }
+
+    .case-filter:hover {
+      font-style: italic;
+    }
+
+    .case-filter.active {
+      font-style: italic;
+    }
+
+
+
+    /* ── BLOCKS ── */
+
+    /* every block has same bottom margin */
+    /* .block { margin-bottom: 25px; } */
+
+    /* text block */
+    /* text block */
+    .block-text {
+      margin-bottom: -1px;
+    }
+
+    .block-title {
+      font-family: var(--font-ui);
+      font-size: var(--size-label);
+      font-variation-settings: var(--fv-ui);
+      padding: 12px 25px 6px 25px;
+      border-top: 1px solid #000;
+    }
+
+
+    .block-text .block-body {
+      font-family: var(--font-body);
+      font-size: var(--size-body);
+      line-height: 1.3;
+      padding: 0px 25px 25px 25px;
+    }
+
+    .block-text .block-body p {
+      margin-bottom: 12px;
+    }
+
+    .block-text .block-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* image block */
+
+    .block-images {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px 25px;
+
+      margin-bottom: -1px;
+    }
+
+    .block-images .img-wrap {
+      height: 400px;
+      overflow: hidden;
+      background: #f0f0f0;
+      flex-shrink: 0;
+    }
+
+    .block-images .img-wrap img {
+      height: 100%;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+
+
+    /* placeholder when no src */
+    .block-images .img-wrap .img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-ui);
+      font-size: var(--size-label);
+      color: #999;
+    }
+
+    /* hidden state for filtering */
+    .block.hidden {
+      display: none;
+    }
+
+    /* about / empty state */
+    #case-empty {
+      padding: 25px;
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+    }
+
+    .about-btn {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      position: absolute;
+      top: 25px;
+      right: 25px;
+    }
+
+    .about-heading {
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      margin-bottom: 16px;
+    }
+
+    .about-body {
+      font-family: var(--font-body);
+      font-size: var(--size-body);
+      line-height: 1.6;
+    }
+
+    .about-body p {
+      margin-bottom: 16px;
+    }
+
+    .about-body p:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="shell">
+
+    <!-- COL-1: project list (auto-built from HTML sections below) -->
+    <div class="col" id="col-1">
+      <div id="col-1-inner">
+        <div id="col-1-header">
+          <div id="site-title" onclick="reset()">Martin Wöllenstein</div>
+          <div id="filters">
+            <button class="tag active" data-tag="all">All</button>
+            <button class="tag" data-tag="Talk">Talk</button>
+            <button class="tag" data-tag="Research">Research</button>
+            <button class="tag" data-tag="Artwork">Artwork</button>
+            <button class="tag" data-tag="Curating">Curating</button>
+            <button class="tag" data-tag="Exhibition">Exhibition</button>
+            <button class="tag" data-tag="Workshop">Workshop</button>
+            <button class="tag" data-tag="Publication">Publication</button>
+            <button class="tag" data-tag="Text">Text</button>
+          </div>
+        </div>
+        <div id="projects-list"></div>
+      </div>
+    </div>
+
+    <!-- HANDLE -->
+    <div class="handle" id="handle-1"></div>
+
+    <!-- COL-2 -->
+    <div class="col" id="col-2">
+
+      <!-- Empty / About state -->
+      <div id="case-empty">
+        <button class="about-btn" onclick="openAbout()">About</button>
+      </div>
+
+      <!-- Topbar — shown when a project is open -->
+      <div id="case-topbar" style="display:none;">
+        <div id="case-title"></div>
+        <div id="case-filters">
+          <button class="case-filter active" data-filter="all" onclick="filterCase('all')">All</button>
+          <button class="case-filter" data-filter="text" onclick="filterCase('text')">Text</button>
+          <button class="case-filter" data-filter="images" onclick="filterCase('images')">Images</button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+         ALL PROJECT SECTIONS
+         ─ To add a new project: copy one <section> block, paste it
+           below the last one, update data-name / data-year / data-tag,
+           then fill in the blocks inside.
+         ═══════════════════════════════════════════════════════════ -->
+      <div id="projects-content">
+
+        <section class="project" data-name="Yellow High" data-year="2024" data-tag="Exhibition">
+          <div class="block block-text" data-type="text">
+            <div class="block-title">Intro</div>
+            <div class="block-body">
+              Designed Environment by MA Scenography during Art Basel CIVIC, Basel Academy of Art and Design FHNW<br>
+              Basel<br>
+              2024
+            </div>
+          </div>
+
+          <div class="block-title">Discription of images</div>
+          <div class="block block-images" data-type="images">
+            <div class="img-wrap"><img src="./images/IMG_8708.jpeg" alt=""></div>
+            <div class="img-wrap"><img src="./images/IMG_8707.jpeg" alt=""></div>
+            <div class="img-wrap"><img src="./images/IMG_8709.jpeg" alt=""></div>
+
+        </section>
+
+        <section class="project" data-name="In-between worlds" data-year="2024" data-tag="Exhibition">
+
+          <div class="block block-text" data-type="text">
+            <div class="block-title">Intro</div>
+            <div class="block-body">
+              Site-Specific Performance Mohnheimer Kulturwerke (commission)<br>
+              Mohnheim (Rhein)<br>
+              2024
+            </div>
+          </div>
+
+          <div class="block block-text" data-type="text">
+            <div class="block-title">Role</div>
+            <div class="block-body">
+              Research<br>
+              Performance<br>
+              Concept<br>
+              Scenography
+            </div>
+          </div>
+
+          <div class="block block-text" data-type="text">
+            <div class="block-title">Dancers</div>
+            <div class="block-body">
+              Erica d’Amico <br>
+              Cristian Cucco <br>
+              Hikaru Osakabe <br>
+              Chiara Viscido
+            </div>
+          </div>
+
+          <div class="block block-text" data-type="text">
+            <div class="block-title">Descrition</div>
+            <div class="block-body">
+              <p> In-between worlds is a comisioned artistic intervention at the construction site of Kulturraffinerie
+                K714. Right next to the Rhine a former shell refinery is being transformed into a state-of-the-art
+                concert hall. This transition is accompanied by a process of cultural mediation which looks into the
+                collective memory, the present social and political climate and the future imagination around the place
+                and local community.
+                The project was preceded by an in-depth archival and participatory research which involved voices and
+                imagery from diverse stakeholders.
+                In the form of a Gesamtkunstwerk the piece combined classical music, dance, installation, video and
+                electronic sound art and walked visitors through different stages of the construction site by staging
+                four movements of transition.</p>
+            </div>
+          </div>
+
+          <div class="block block-images" data-type="images">
+            <div class="img-wrap"><img src="./images/before after2.jpg" alt=""></div>
+          </div>
+        </section>
+
+        </section>
+
+        <!-- ────────────────────────────────────────
+           ADD NEXT PROJECT HERE
+           Copy the <section>...</section> above
+           ──────────────────────────────────────── -->
+
+      </div><!-- #projects-content -->
+
+    </div><!-- #col-2 -->
+  </div><!-- #shell -->
+
+  <script>
+
+    /* ── BUILD SIDEBAR FROM HTML SECTIONS ── */
+    const sections = Array.from(document.querySelectorAll('.project'));
+
+    // hide all sections on load
+    sections.forEach(s => s.style.display = 'none');
+
+    // build sidebar rows from data attributes
+    document.getElementById('projects-list').innerHTML = sections.map((s, i) =>
+      `<div class="proj-row" data-index="${i}" onclick="openProject(${i})">
+    <span class="proj-name">${s.dataset.name}</span>
+    <span class="proj-year">${s.dataset.year}</span>
+  </div>`
+    ).join('');
+
+    /* ── LEFT TAG FILTER ── */
+    let activeTag = 'all';
+
+    document.getElementById('filters').addEventListener('click', e => {
+      const btn = e.target.closest('.tag');
+      if (!btn) return;
+      activeTag = btn.dataset.tag;
+      document.querySelectorAll('.tag').forEach(t => t.classList.toggle('active', t === btn));
+      updateSidebar();
+    });
+
+    function updateSidebar() {
+      document.querySelectorAll('.proj-row').forEach(row => {
+        const sec = sections[+row.dataset.index];
+        row.style.display = (activeTag === 'all' || sec.dataset.tag === activeTag) ? '' : 'none';
+      });
+    }
+
+    /* ── OPEN PROJECT ── */
+    let activeIndex = null;
+
+    function openProject(i) {
+      activeIndex = i;
+
+      // highlight sidebar row
+      document.querySelectorAll('.proj-row').forEach(r =>
+        r.classList.toggle('active', +r.dataset.index === i));
+
+      // set topbar title
+      document.getElementById('case-title').textContent = sections[i].dataset.name;
+
+      // hide all sections, show selected
+      sections.forEach(s => s.style.display = 'none');
+      sections[i].style.display = 'block';
+
+      // show topbar, hide empty state
+      document.getElementById('case-topbar').style.display = '';
+      document.getElementById('case-empty').style.display = 'none';
+
+      filterCase('all');
+      document.getElementById('col-2').scrollTop = 0;
+    }
+
+    /* ── CASE FILTER (text / images / all) ── */
+    function filterCase(type) {
+      document.querySelectorAll('.case-filter').forEach(b =>
+        b.classList.toggle('active', b.dataset.filter === type));
+      if (activeIndex === null) return;
+      sections[activeIndex].querySelectorAll('.block').forEach(block =>
+        block.classList.toggle('hidden', type !== 'all' && block.dataset.type !== type));
+    }
+
+    /* ── ABOUT ── */
+    function openAbout() {
+      activeIndex = null;
+      document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+      sections.forEach(s => s.style.display = 'none');
+      document.getElementById('case-topbar').style.display = 'none';
+      document.getElementById('case-empty').innerHTML = `
+    <div style="padding:25px;">
+      <div class="about-heading">About</div>
+      <div class="about-body">
+        <p>Martin Wöllenstein is a transdisciplinary artist and researcher. His work investigates global infrastructures, histories, and politics to trace how material and symbolic violence is encoded into systems.</p>
+        <p>Martin studied Fine Arts, Scenography, and Transversal Design in Halle, Havana, and Basel. He co-founded the artist platforms Nnoboa Space in Ghana (2023) and VIVA Comunidad Creativa in Cuba (2017).</p>
+        <p>He lives between Basel and Accra.</p>
+      </div>
+    </div>`;
+      document.getElementById('case-empty').style.display = 'block';
+    }
+
+    /* ── RESET (click name) ── */
+    function reset() {
+      activeIndex = null;
+      document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+      sections.forEach(s => s.style.display = 'none');
+      document.getElementById('case-topbar').style.display = 'none';
+      document.getElementById('case-empty').innerHTML = `
+    <button class="about-btn" onclick="openAbout()">About</button>`;
+      document.getElementById('case-empty').style.display = 'block';
+      document.getElementById('col-2').scrollTop = 0;
+    }
+
+    /* ── RESIZE HANDLE ── */
+    (function () {
+      const handle = document.getElementById('handle-1');
+      const left = document.getElementById('col-1');
+      const right = document.getElementById('col-2');
+      let drag = false, startX = 0, startL = 0, startR = 0;
+
+      handle.addEventListener('mousedown', e => {
+        drag = true; startX = e.clientX; startL = left.offsetWidth; startR = right.offsetWidth;
+        handle.style.background = 'rgba(0,0,0,0.08)';
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+      });
+      document.addEventListener('mousemove', e => {
+        if (!drag) return;
+        left.style.width = Math.max(80, startL + e.clientX - startX) + 'px';
+        right.style.width = Math.max(80, startR - e.clientX + startX) + 'px';
+        left.style.transition = right.style.transition = 'none';
+      });
+      document.addEventListener('mouseup', () => {
+        if (!drag) return; drag = false;
+        handle.style.background = '';
+        document.body.style.cursor = document.body.style.userSelect = '';
+        left.style.transition = right.style.transition = '';
+      });
+    })();
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Martin Wöllenstein</title>
+  <style>
+    @font-face {
+      font-family: 'Unica';
+      src: url('./HGKBUnica77VIPBeta.ttf') format('truetype');
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Source';
+      src: url('./SourceSerifVariable-Roman.otf') format('opentype');
+      font-style: normal;
+    }
+
+    :root {
+      --font-ui: 'Unica', sans-serif;
+      --font-body: 'Source', serif;
+      --fv-ui:   'wght' 80;
+      --fv-body: 'wght' 400;
+
+
+      --size-ui: 26px;
+      --size-label: 16px;
+      --size-body: 26px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      color: #000;
+      background: #fff;
+    }
+
+    #shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .col {
+      overflow-y: auto;
+      flex-shrink: 0;
+      transition: width 0.25s ease;
+    }
+
+    #col-1 {
+      width: 100%;
+      border-right: 1px solid #000;
+    }
+
+    #col-2 {
+      width: 0;
+      overflow: hidden;
+    }
+
+    #col-3 {
+      width: 0;
+      overflow: hidden;
+    }
+
+    #col-1.s2 {
+      width: 33%;
+    }
+
+    #col-2.s2 {
+      width: 67%;
+      border-right: 1px solid #000;
+    }
+
+    #col-1.s3 {
+      width: 25%;
+    }
+
+    #col-2.s3 {
+      width: 33%;
+      border-right: 1px solid #000;
+    }
+
+    #col-3.s3 {
+      width: 42%;
+    }
+
+    .handle {
+      width: 5px;
+      flex-shrink: 0;
+      cursor: col-resize;
+      background: transparent;
+      display: none;
+      z-index: 10;
+    }
+
+    .handle.dragging {
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    #col-1-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 25px;
+      border-bottom: 1px solid #000;
+    }
+
+    #col-1-header span {
+      cursor: pointer;
+      
+
+    }
+
+    #col-1-header span:hover {
+      opacity: 0.5;
+    }
+
+    #col-1-header button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      padding: 0;
+    }
+
+    #col-1-header button:hover {
+      opacity: 0.5;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 25px;
+      border-bottom: 1px solid #000;
+      cursor: pointer;
+    }
+
+    .row:hover {
+      background: #f5f5f5;
+    }
+
+    .row.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .pad {
+      padding: 12px 25px;
+    }
+
+    .intro {
+      font-family: var(--font-body);
+      font-size: var(--size-body);
+      font-variation-settings: var(--fv-body);
+      line-height: 1.4;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid #000;
+      background: none;
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      width: 100%;
+      cursor: pointer;
+       font-family: var(--font-ui);
+      font-size: var(--size-ui);
+      font-variation-settings: var(--fv-ui);
+      text-align: left;
+    }
+
+    .btn:last-child {
+      border-bottom: 1px solid #000;
+    }
+
+    .btn:hover {
+      opacity: 0.5;
+    }
+
+    /* .arr {
+      color: #aaa;
+      transition: transform 0.2s;
+      display: inline-block;
+    } */
+
+    /* .btn.active .arr {
+      transform: rotate(90deg);
+    } */
+
+    .body {
+      font-family: var(--font-body);
+      font-size: var(--size-body);
+      font-variation-settings: var(--fv-body);
+      line-height: 1.2;
+    }
+
+    .body p {
+      margin-bottom: 16px;
+    }
+
+    .body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .cl {
+      margin-bottom: 20px;
+    }
+
+    .cl-label {
+      font-family: var(--font-ui);
+      font-size: var(--size-label);
+      font-variation-settings: var(--fv-ui);
+      margin-bottom: 4px;
+    }
+
+    .cl-val {
+      font-family: var(--font-body);
+      font-size: var(--size-body);
+      font-variation-settings: var(--fv-body);
+      line-height: 1.2;
+    }
+
+    .ig {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .ii {
+      background: #e8e8e8;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-ui);
+      font-size: var(--size-label);
+      font-variation-settings: var(--fv-ui);
+      color: #999;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .ii.w {
+      grid-column: 1/-1;
+      aspect-ratio: 16/7;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="shell">
+
+    <div class="col" id="col-1">
+      <div id="col-1-header">
+        <span onclick="reset()">Martin Wöllenstein</span>
+        <button onclick="openAbout()">About</button>
+      </div>
+      <div id="projects-list">
+        <div class="row" id="proj-row" onclick="openProject()">
+          <span>Yellow High</span>
+          <span>2024</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="handle" id="handle-1"></div>
+    <div class="col" id="col-2"></div>
+    <div class="handle" id="handle-2"></div>
+    <div class="col" id="col-3"></div>
+
+  </div>
+
+  <script>
+    const project = {
+      name: "Yellow High",
+      year: "2024",
+      intro: "Designed Environment by MA Scenography during Art Basel. CIVIC, Basel Academy of Art and Design FHNW, Basel, 2024.",
+      credits: [
+        { label: "Role", val: "Designer\nCo-Curator\nHost" },
+        { label: "Methods", val: "Spatial Design\nExperience Design\nSonic Experimentation\nChoreography" },
+        { label: "Collaborators", val: "Adelina Malekova\nJimena Martel Bidegain\nRenê Salazar\nConnor Muething\nMarcial Koch" },
+        { label: "Sound Design", val: "Iman" },
+        { label: "Instrumentalists", val: "Köbi Dolder & Thomas Schauffert" },
+        { label: "Dance", val: "Pietro Cono Genova\nGiulia Esposito" },
+        { label: "Mentoring", val: "Prof. Charlotte Tamschick\nMartina Ehleiter" },
+        { label: "Support", val: "Matylda Krzykowski, CIVIC Artistic Lead" }
+      ],
+      texts: [
+        "Yellow High is a spatial intervention at CIVIC by the MA Scenography Class. Yell, low high repurposes a hot air balloon's massive fabric to construct a sculptural space that hosts an olfactory and sonic experience in its inside.\n\nDuring several days we invited musicians and dancers to play the space and to explore its aesthetic and material potentials.",
+        "As future spatial designers we are learning to configure spaces to host experiences. Our practice confronts us with questions about what these spaces should look, feel and act like. More fundamentally we need to consider what kind of spaces we want to generate and for what kind of audiences?\n\nWe were aiming to create a space that is accommodating, hospitable and reveals itself intuitively based on embodied exploration and without further explanation. It functioned as an immersive set: a playground for many. At CIVIC, Yell, low high acted as a public experiment of body power on the presence and the role of bodies in civic action.",
+        "The dream of flying is as old as humanity. Hot air balloons were the first objects to make humans fly over longer distances.\n\nThere is something strange and poetic about turning a balloon into an exhibition space. Formerly filled with hot air and flying in the sky this yellow giant now provides space for bodies to explore its inside on the ground. This space invites not to look for something but to be with others, in space, time, sound and scent.\n\nWhen experimenting with the balloon, we faced a material so expansive and unwieldy that the six of us could barely manage to move or control. Our strategy has been collective, distributed, multilayered and experimental.\n\nToday, the dream of flying keeps evolving towards extensive explorations of outer space. Meanwhile, humanity hasn't figured out yet how to co-exist on the ground of the earth. On this very fragile ground, the balloon continues its journey as something new and weirdly alive — Get low with it!"
+
+      ],
+      images: ["balloon.jpeg", "IMG_8707.jpeg", "IMG_8708.jpeg", "IMG_8709.jpeg", "IMG_8796.jpeg", "IMG_8978.jpeg", "installation.HEIC", "performance_DSF0701.jpg", "show_DSF1102.jpg", "show_DSF1134.jpg"]
+    };
+
+    const aboutText = "Martin Wöllenstein is a transdisciplinary artist and researcher. His work investigates global infrastructures, histories, and politics to trace how material and symbolic violence is encoded into systems.\n\nMartin studied Fine Arts, Scenography, and Transversal Design in Halle, Havana, and Basel. He co-founded the artist platforms Nnoboa Space in Ghana (2023) and VIVA Comunidad Creativa in Cuba (2017).\n\nHe lives between Basel and Accra.";
+
+    function openProject() {
+      document.getElementById("proj-row").classList.add("active");
+      setColumns("s2", "s2", "");
+      document.getElementById("col-2").innerHTML = `
+    <div class="pad">
+      <div style="margin-bottom:16px">${project.name}</div>
+      <div class="intro">${project.intro}</div>
+      <button class="btn" id="btn-credits" onclick="openSection('credits')"><span>Credits</span><span class="">›</span></button>
+      <button class="btn" id="btn-text"    onclick="openSection('text')"><span>Text</span><span class="">›</span></button>
+      <button class="btn" id="btn-images"  onclick="openSection('images')"><span>Images</span><span class="">›</span></button>
+    </div>`;
+      setTimeout(updateHandles, 280);
+    }
+
+    function openSection(s) {
+      setColumns("s3", "s3", "s3");
+      document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("btn-" + s).classList.add("active");
+      const col3 = document.getElementById("col-3");
+      col3.scrollTop = 0;
+      if (s === "credits") {
+        col3.innerHTML = `<div class="pad">${project.credits.map(c =>
+          `<div class="cl"><div class="cl-label">${c.label}</div><div class="cl-val">${c.val.replace(/\n/g, "<br>")}</div></div>`
+        ).join("")}</div>`;
+      } else if (s === "text") {
+        col3.innerHTML = `<div class="pad"><div class="body">${project.texts.map(t =>
+          t.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("")
+        ).join("")}</div></div>`;
+      } else if (s === "images") {
+        col3.innerHTML = `<div class="pad"><div class="ig">${project.images.map((img, i) =>
+          `<div class="ii${i === 0 ? " w" : ""}">${img}</div>`
+        ).join("")}</div></div>`;
+      }
+      setTimeout(updateHandles, 280);
+    }
+
+    function openAbout() {
+      document.getElementById("proj-row").classList.remove("active");
+      setColumns("s2", "s2", "");
+      document.getElementById("col-2").innerHTML = `
+    <div class="pad">
+      <div style="margin-bottom:16px">About</div>
+      <div class="body">${aboutText.split(/\n\n+/).map(p => `<p>${p}</p>`).join("")}</div>
+    </div>`;
+      setTimeout(updateHandles, 280);
+    }
+
+    function reset() {
+      document.getElementById("proj-row").classList.remove("active");
+      setColumns("", "", "");
+      document.getElementById("col-2").innerHTML = "";
+      document.getElementById("col-3").innerHTML = "";
+      setTimeout(updateHandles, 50);
+    }
+
+    function setColumns(c1, c2, c3) {
+      ["col-1", "col-2", "col-3"].forEach((id, i) => {
+        const el = document.getElementById(id);
+        const cls = [c1, c2, c3][i];
+        el.className = "col" + (cls ? " " + cls : "");
+        el.style.width = "";
+      });
+    }
+
+    // ── RESIZE ──
+    function makeResizable(handleId, leftId, rightId) {
+      const handle = document.getElementById(handleId);
+      const left = document.getElementById(leftId);
+      const right = document.getElementById(rightId);
+      let drag = false, startX = 0, startL = 0, startR = 0;
+
+      handle.addEventListener("mousedown", e => {
+        if (!left.offsetWidth || !right.offsetWidth) return;
+        drag = true; startX = e.clientX; startL = left.offsetWidth; startR = right.offsetWidth;
+        handle.classList.add("dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+      });
+      document.addEventListener("mousemove", e => {
+        if (!drag) return;
+        const d = e.clientX - startX;
+        left.style.width = Math.max(80, startL + d) + "px";
+        right.style.width = Math.max(80, startR - d) + "px";
+        left.style.transition = right.style.transition = "none";
+      });
+      document.addEventListener("mouseup", () => {
+        if (!drag) return;
+        drag = false;
+        handle.classList.remove("dragging");
+        document.body.style.cursor = document.body.style.userSelect = "";
+        left.style.transition = right.style.transition = "";
+      });
+    }
+
+    function updateHandles() {
+      const c1 = document.getElementById("col-1").offsetWidth;
+      const c2 = document.getElementById("col-2").offsetWidth;
+      const c3 = document.getElementById("col-3").offsetWidth;
+      document.getElementById("handle-1").style.display = (c1 > 0 && c2 > 0) ? "block" : "none";
+      document.getElementById("handle-2").style.display = (c2 > 0 && c3 > 0) ? "block" : "none";
+    }
+
+    makeResizable("handle-1", "col-1", "col-2");
+    makeResizable("handle-2", "col-2", "col-3");
+    updateHandles();
+  </script>
+</body>
+
+</html>

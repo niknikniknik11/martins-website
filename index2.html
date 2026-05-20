@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Wöllenstein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&family=Inter+Tight:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --pad: 25px;
+            --bg: #ffffff;
+            --sidebar-bg: #e4e4e4;
+            --text: #0a0a0a;
+            --muted: #777;
+            --border: #c8c8c8;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            border: 1px solid #000;
+        }
+
+        /* ══ SIDEBAR ══ */
+        #sidebar {
+            width: 33%;
+            min-width: 200px;
+            max-width: 480px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #sidebar-inner {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--pad);
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: none;
+        }
+
+        #sidebar-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .s-title {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(18px, 2.4vw, 28px);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+
+        .s-title:hover {
+            opacity: 0.6;
+        }
+
+        .s-sub {
+            font-size: 11px;
+            font-style: italic;
+            color: var(--muted);
+            margin-bottom: 20px;
+            font-family: 'Inter Tight', sans-serif;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 22px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 9px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.1s;
+            line-height: 1.6;
+        }
+
+        .tag:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        .tag.active {
+            background: var(--text);
+            color: #fff;
+            border-color: var(--text);
+        }
+
+        .s-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .proj-list {
+            list-style: none;
+        }
+
+        .proj-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 8px 0;
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .proj-row:hover {
+            opacity: 0.5;
+        }
+
+        .proj-row.active .proj-name {
+            font-weight: 700;
+        }
+
+        .proj-name {
+            font-size: 13px;
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 400;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .proj-year {
+            font-size: 12px;
+            color: var(--muted);
+            flex-shrink: 0;
+            margin-left: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 20;
+        }
+
+        #resize-handle:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        #resize-handle.dragging {
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        /* ══ MAIN ══ */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* topbar — hidden when detail is open */
+        #topbar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 14px 15px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        #topbar.hidden {
+            display: none;
+        }
+
+        #page-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(16px, 2vw, 22px);
+            letter-spacing: -0.01em;
+        }
+
+        #about-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            background: none;
+            border: none;
+            /* cursor: pointer; */
+            padding: 0;
+            /* text-transform: uppercase; */
+            transition: opacity 0.1s;
+        }
+
+        #about-btn:hover {
+            opacity: 0.4;
+        }
+
+        #about-btn.active {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        /* views: all hidden by default, shown via JS */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadein 0.18s ease;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* home needs flex */
+        #view-home {
+            flex-direction: column;
+            justify-content: space-between;
+            padding: var(--pad);
+            padding-top: 0;
+            height: 100%;
+        }
+
+        #view-home.active {
+            display: flex;
+        }
+
+        /* ══ HOME ══ */
+        .home-top {
+            padding-top: clamp(40px, 8vh, 80px);
+            max-width: 520px;
+        }
+
+        .home-statement {
+            font-family: 'Inter Tight', sans-serif;
+            font-size: clamp(15px, 1.6vw, 18px);
+            font-weight: 400;
+            line-height: 1.65;
+            color: #333;
+        }
+
+        .home-bottom {
+            padding-bottom: var(--pad);
+        }
+
+        .home-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .current-list {
+            list-style: none;
+        }
+
+        .current-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: baseline;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .current-item:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .current-item:hover {
+            opacity: 0.5;
+        }
+
+        .ci-left {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ci-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(14px, 1.5vw, 17px);
+            letter-spacing: -0.02em;
+        }
+
+        .ci-where {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .ci-right {
+            text-align: right;
+        }
+
+        .ci-tag {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .ci-year {
+            font-size: 11px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ══ PROJECTS TABLE ══ */
+        #view-projects {
+            padding: var(--pad);
+            padding-top: 20px;
+        }
+
+        .proj-table-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 24px;
+            align-items: baseline;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .proj-table-row:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .proj-table-row:hover {
+            opacity: 0.45;
+        }
+
+        .pt-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(14px, 1.6vw, 19px);
+            letter-spacing: -0.02em;
+        }
+
+        .pt-tag {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .pt-year {
+            font-size: 12px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ══ DETAIL ══ */
+        #view-detail {
+            padding: 0;
+        }
+
+        .detail-back-bar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 15px;
+        }
+
+        #detail-back {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0;
+            transition: color 0.1s;
+        }
+
+        #detail-back:hover {
+            color: var(--text);
+        }
+
+        .detail-header {
+            padding: 32px 15px 0;
+        }
+
+        .detail-title {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .detail-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .detail-link {
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+
+        .detail-link a {
+            color: var(--text);
+        }
+
+        /* ══ ACCORDION ══ */
+        .accordion {
+            margin: 24px 0 60px;
+        }
+
+        .acc-item {
+            border-top: 1px solid var(--border);
+        }
+
+        .acc-item:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .acc-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            text-align: left;
+            transition: opacity 0.1s;
+        }
+
+        .acc-trigger:hover {
+            opacity: 0.45;
+        }
+
+        .acc-arrow {
+            font-size: 16px;
+            color: var(--muted);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+            margin-left: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+        }
+
+        .acc-item.open .acc-arrow {
+            transform: rotate(90deg);
+        }
+
+        .acc-body {
+            display: none;
+            padding: 4px 15px 32px;
+        }
+
+        .acc-item.open .acc-body {
+            display: block;
+        }
+
+        /* ── Intro ── */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+        }
+
+        .intro-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        .intro-val {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* ── Credits ── */
+        .credits-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 40px;
+        }
+
+        .cred-label {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+
+        .cred-val {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            line-height: 1.75;
+            color: #333;
+        }
+
+        /* ── Text ── */
+        .text-section-title {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+            margin: 32px 0 12px;
+        }
+
+        .text-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .text-body {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            line-height: 1.85;
+            color: #333;
+            max-width: 640px;
+        }
+
+        .text-body p {
+            margin-bottom: 14px;
+        }
+
+        .text-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ── Images ── */
+        .images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .img-item {
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border);
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .img-item:hover {
+            opacity: 0.8;
+        }
+
+        .img-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .img-item.wide {
+            grid-column: 1 / -1;
+            aspect-ratio: 16/7;
+        }
+
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox.open {
+            display: flex;
+        }
+
+        #lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        #lb-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* ══ ABOUT ══ */
+        #view-about {
+            padding: var(--pad);
+            padding-top: 20px;
+            max-width: 540px;
+        }
+
+        .about-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(26px, 4vw, 46px);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .about-role {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            margin-bottom: 28px;
+        }
+
+        #view-about p {
+            font-size: 14px;
+            line-height: 1.78;
+            color: #333;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- SIDEBAR -->
+        <nav id="sidebar">
+            <div id="sidebar-inner">
+                <div class="s-title" onclick="showHome()">Martin Wöllenstein</div>
+                <div class="s-sub">Artist / Researcher / Curator</div>
+                <div class="tag-row" id="tag-list">
+                    <button class="tag active" data-tag="all">All</button>
+                    <button class="tag" data-tag="Talk">Talk</button>
+                    <button class="tag" data-tag="Research">Research</button>
+                    <button class="tag" data-tag="Artwork">Artwork</button>
+                    <button class="tag" data-tag="Curating">Curating</button>
+                    <button class="tag" data-tag="Exhibition">Exhibition</button>
+                    <button class="tag" data-tag="Workshop">Workshop</button>
+                    <button class="tag" data-tag="Publication">Publication</button>
+                    <button class="tag" data-tag="Text">Text</button>
+                </div>
+                <hr class="s-divider">
+                <ul class="proj-list" id="project-list"></ul>
+            </div>
+            <div id="resize-handle"></div>
+        </nav>
+
+        <!-- MAIN -->
+        <div id="main">
+            <div id="topbar">
+                <div id="page-name">Martin Wöllenstein</div>
+                <button id="about-btn" onclick="showAbout()">About
+
+                </button>
+            </div>
+
+            <div id="content">
+
+                <!-- HOME -->
+                <div id="view-home" class="view">
+                    <div class="home-top">
+                        <p class="home-statement">Transdisciplinary artist and researcher working at the intersection of
+                            global infrastructures, collaborative practice, and spatial imagination. Based between Basel
+                            and Accra.</p>
+                    </div>
+                    <div class="home-bottom">
+                        <div class="home-section-label">Current &amp; Upcoming</div>
+                        <ul class="current-list" id="current-list"></ul>
+                    </div>
+                </div>
+
+                <!-- PROJECTS TABLE -->
+                <div id="view-projects" class="view">
+                    <div id="projects-table"></div>
+                </div>
+
+                <!-- DETAIL -->
+                <div id="view-detail" class="view">
+                    <div class="detail-back-bar">
+                        <div class="detail-title" id="d-title"></div>
+                        <button id="about-btn-detail" onclick="showAbout()">About</button>
+                    </div>
+                    <div class="detail-header">
+                        <div class="detail-sub" id="d-sub"></div>
+                        <div class="detail-link" id="d-link"></div>
+                    </div>
+                    <div class="accordion" id="accordion"></div>
+                </div>
+
+                <!-- ABOUT -->
+                <div id="view-about" class="view">
+                    <div style="padding: var(--pad); padding-top: 20px; max-width: 540px;">
+                        <div class="about-name">Martin<br>Wöllenstein</div>
+                        <div class="about-role">Artist / Researcher / Curator</div>
+                        <p>Martin Wöllenstein is a transdisciplinary artist and researcher. His work investigates global
+                            infrastructures, histories, and politics to trace how material and symbolic violence is
+                            encoded into systems. In mostly collaborative projects, he explores how to counteract these
+                            systems by proposing more liveable and joyful worlds. His methods include co-design,
+                            space-making, writing, curating, and publishing.</p>
+                        <p>Martin studied Fine Arts, Scenography, and Transversal Design in Halle, Havana, and Basel. He
+                            co-founded the artist platforms Nnoboa Space in Ghana (2023) and VIVA Comunidad Creativa in
+                            Cuba (2017) and is a frequent collaborator of the Berlin-based, zero-waste fashion label
+                            IMPARI.</p>
+                        <p>His work has been shown internationally at institutions including Havana Biennial (2015),
+                            Nubuke Foundation Accra (2023), Villa Medici Rome (2024), Artco Gallery Berlin (2024),
+                            Goethe Institute Accra (2025), Perve Gallery Lisbon (2025), and CIVIC Basel (2025). He lives
+                            between Basel and Accra.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+        <button id="lb-close" onclick="closeLB()">✕</button>
+        <img id="lb-img" src="" alt="">
+    </div>
+
+    <script>
+        // ── DATA ──
+        const projects = [
+            { id: 101, name: "Basel Trans-Mission", year: "upcoming", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 102, name: "A+X", year: "upcoming", tag: "Exhibition", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 103, name: "Confetti Collection", year: "upcoming", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 104, name: "New Rituals — Exhibition Design", year: "upcoming", tag: "Exhibition", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 105, name: "La Isla en Peso — Cuba Publication", year: "upcoming", tag: "Publication", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 106, name: "Sarritah — Photo Publications", year: "upcoming", tag: "Publication", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 201, name: "Berlin Fashion Week", year: "2026", tag: "Artwork", location: "Berlin", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 202, name: "Exhibition: Flowing Upstream", year: "2026", tag: "Exhibition", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 203, name: "Text: Designs in the Wasteocene", year: "2026", tag: "Text", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 204, name: "Publication: Social Design Conference", year: "2026", tag: "Publication", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 301, name: "WithoutWaste", year: "2025", tag: "Research", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 302, name: "Crafting Futures Together", year: "2025", tag: "Workshop", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 303, name: "Mascaras Portuguesas", year: "2025", tag: "Artwork", location: "Perve Gallery, Lisbon", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 304, name: "Iridescence — Transversal Design Research", year: "2025", tag: "Exhibition", location: "SILO, Basel", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 305, name: "Earth Icons Dossier", year: "2025", tag: "Publication", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 306, name: "Walk: Basel Critical Infrastructures", year: "2025", tag: "Research", location: "Basel", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 307, name: "Lecture: Social Design Conference", year: "2025", tag: "Talk", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 401, name: "CIVIC FORUM", year: "2024", tag: "Curating", location: "Basel", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 402, name: "Speed Date at Freilager", year: "2024", tag: "Workshop", location: "Basel", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 403, name: "Unleashed", year: "2024", tag: "Exhibition", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 404, name: "Plataforma Campo", year: "2024", tag: "Curating", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 405, name: "Mesh Festival", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 406, name: "Sitterwerk Residency", year: "2024", tag: "Research", location: "Basel", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 407, name: "ABC", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 408, name: "Goldstück", year: "2024", tag: "Exhibition", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            {
+                id: 409,
+                name: "Yellow High",
+                year: "2024",
+                tag: "Exhibition",
+                location: "CIVIC, Basel Academy of Art and Design FHNW, Basel",
+                link: "https://civic.hgk.fhnw.ch/?s=yell-low-high",
+                roles: ["Designer", "Co-Curator", "Host"],
+                methods: ["Spatial Design", "Experience Design", "Sonic Experimentation", "Choreography"],
+                collaborators: [
+                    { label: "Collaborators", names: ["Adelina Malekova", "Jimena Martel Bidegain", "Renê Salazar", "Connor Muething", "Marcial Koch"] },
+                    { label: "Sound Design", names: ["Iman"] },
+                    { label: "Instrumentalists", names: ["Köbi Dolder & Thomas Schauffert"] },
+                    { label: "Dance", names: ["Pietro Cono Genova", "Giulia Esposito"] },
+                    { label: "Mentoring", names: ["Prof. Charlotte Tamschick", "Martina Ehleiter"] },
+                    { label: "Support", names: ["Matylda Krzykowski, CIVIC Artistic Lead"] }
+                ],
+                texts: [
+                    {
+                        title: "About",
+                        body: "Yellow High is a spatial intervention at CIVIC by the MA Scenography Class. Yell, low high repurposes a hot air balloon's massive fabric to construct a sculptural space that hosts an olfactory and sonic experience in its inside.\n\nDuring several days we invited musicians and dancers to play the space and to explore its aesthetic and material potentials."
+                    },
+                    {
+                        title: "Statement",
+                        body: "As future spatial designers we are learning to configure spaces to host experiences. Our practice confronts us with questions about what these spaces should look, feel and act like. More fundamentally we need to consider what kind of spaces we want to generate and for what kind of audiences?\n\nWe were aiming to create a space that is accommodating, hospitable and reveals itself intuitively based on embodied exploration and without further explanation. It functioned as an immersive set: a playground for many. At CIVIC, Yell, low high acted as a public experiment of body power on the presence and the role of bodies in civic action."
+                    },
+                    {
+                        title: "Curatorial Statement",
+                        body: "The dream of flying is as old as humanity. Hot air balloons were the first objects to make humans fly over longer distances. We can imagine their invention to be born out of both: an innocent human curiosity, and the strategic interest to chart and explore territory.\n\nThere is something strange and poetic about turning a balloon into an exhibition space. Formerly filled with hot air and flying in the sky this yellow giant now provides space for bodies to explore its inside on the ground. The balloon can be seen as an invitation to change the perspective from the bird's eye view of a removed observer to an involved point of view from within. This space invites not to look for something but to be with others, in space, time, sound and scent.\n\nWhen experimenting with the balloon, we faced a material so expansive and unwieldy that the six of us could barely manage to move or control. This situation reminded us what it is like to relate to bigger entities beyond individual power such as a state administration, a specific industry or an educational institution. Those entities can attract, assemble, activate and serve, while simultaneously having the tendency to incorporate, accumulate, trap and absorb the ones involved with them. We find ourselves constantly moving between keeping our own agency and handing over control. Our strategy in relation to this yellow giant has been collective, distributed, multilayered and experimental.\n\nIn the spirit of an open-ended design process, we are inviting other practitioners and visitors to multiply the connections made so far by exploring and appropriating the space in their own ways. At CIVIC, YELL, LOW HIGH acts as a public experiment of body power on the presence and the role of bodies in civic action.\n\nToday, the dream of flying keeps evolving towards extensive explorations of outer space. Meanwhile, humanity hasn't figured out yet how to co-exist on the ground of the earth. On this very fragile ground, the balloon continues its journey as something new and weirdly alive. It is calling you to enter and become a part — Get low with it!"
+                    },
+                    {
+                        title: "Manual on How to Make an Installation from a Hot Air Balloon",
+                        body: "Strategy = collective, distributed, multilayered, experimental\n\nRepurpose the material without losing its central qualities.\nGive it a fantastic character without erasing its uncanniness.\nMake a story without trying to even out contradictions.\nWork around safety restrictions without killing the spontaneity.\nInvite other practitioners and the audience to explore its uses and meanings.\nServe yummy drinks and ice cream in the color of the balloon.\nTry out stuff physically: observe it as it inflated and deflates, modify its shape, inhabit it, lay in it, nap in it, dream in it, sit with it, play with it, dance around it, etc.\n\nFrom: \"Activations, Un-form-ations, Strategies from dealing with a yellow giant\" (side-notes on the making of the exhibition by Martin Wöllenstein)"
+                    }
+                ],
+                images: [
+                    { src: null, caption: "balloon.jpeg" },
+                    { src: null, caption: "IMG_8707.jpeg" },
+                    { src: null, caption: "IMG_8708.jpeg" },
+                    { src: null, caption: "IMG_8709.jpeg" },
+                    { src: null, caption: "IMG_8796.jpeg" },
+                    { src: null, caption: "IMG_8978.jpeg" },
+                    { src: null, caption: "installation.HEIC" },
+                    { src: null, caption: "performance_DSF0701.jpg" },
+                    { src: null, caption: "show_DSF1102.jpg" },
+                    { src: null, caption: "show_DSF1134.jpg" }
+                ]
+            },
+            { id: 410, name: "Virtual Beauty", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 411, name: "Cyphers Everywhere", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 412, name: "Chimeras", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            {
+                id: 413, name: "In Between Worlds", year: "2024", tag: "Artwork",
+                location: "Mohnheimer Kulturwerke, Monheim am Rhein",
+                link: "https://hidalgofestival.de/hidalgo-kollektiv/",
+                roles: ["Research", "Concept", "Scenography", "Performance"],
+                methods: ["Artistic Direction", "Site-Specific Performance", "Archival & Participatory Research"],
+                collaborators: [
+                    { label: "Artistic Direction", names: ["Tom Wilmersdörffer"] },
+                    { label: "Choreography", names: ["Roberta Pisu"] },
+                    { label: "Musical Direction", names: ["Anne Keckes"] },
+                    { label: "Dancers", names: ["Erica d'Amico", "Cristian Cucco", "Hikaru Osakabe", "Chiara Viscido"] },
+                    { label: "Actors", names: ["Michael Meichßner", "Tim Olrik Stöneberg", "Antonia Schirmeister"] },
+                    { label: "Musicians", names: ["Malion Quartett", "NEO Quartett"] },
+                    { label: "Production", names: ["Eva Niesen", "Sina Kerkert"] },
+                    { label: "Video", names: ["Leopold Helbich"] },
+                    { label: "Sound Design", names: ["Paul Bießmann"] }
+                ],
+                texts: [
+                    { title: "About", body: "In Between Worlds is a commissioned artistic intervention at the construction site of Kulturraffinerie K714. Right next to the Rhine, a former shell refinery is being transformed into a state-of-the-art concert hall.\n\nThe project was preceded by an in-depth archival and participatory research involving voices and imagery from diverse stakeholders. In the form of a Gesamtkunstwerk the piece combined classical music, dance, installation, video and electronic sound art and walked visitors through different stages of the construction site by staging four movements of transition." }
+                ],
+                images: []
+            },
+            { id: 414, name: "Disco Concrete Mixer", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 415, name: "Grain", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 416, name: "Nexa Award", year: "2024", tag: "Research", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 417, name: "Feed Me Not", year: "2024", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 501, name: "Symphonie", year: "2023", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 502, name: "Accra Exhibition", year: "2023", tag: "Exhibition", location: "Nubuke Foundation, Accra", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 503, name: "MA Experimental Design Zine", year: "2023", tag: "Publication", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 504, name: "Nnoboa Space", year: "2023", tag: "Curating", location: "Ghana", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 601, name: "Xomata", year: "2021", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 602, name: "191 Trips", year: "2021", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 603, name: "passion.com", year: "2019", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 604, name: "VIVA", year: "2018", tag: "Curating", location: "Cuba", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 605, name: "Simulacro", year: "2018", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 606, name: "Oguna Masa", year: "2017", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 607, name: "Solaris", year: "2017", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 608, name: "Mansfeld Vulkanoes", year: "2016", tag: "Research", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 609, name: "Casa Nuestra", year: "2015", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 610, name: "El Blanco de Casa Blanca", year: "2015", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 611, name: "Monument for the Orphans", year: "2014", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 612, name: "Rapsody", year: "2014", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 613, name: "1250 Ave Marias", year: "2012", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 614, name: "The Encyclopedic Anachronism", year: "2012", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 615, name: "A Deadly Love", year: "2012", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] },
+            { id: 616, name: "Floriography", year: "2011", tag: "Artwork", location: "", link: "", roles: [], methods: [], collaborators: [], texts: [], images: [] }
+        ];
+
+        const currentIds = [101, 102, 103, 104, 105, 106, 201, 202, 203, 204];
+        let activeTag = "all";
+        let activeId = null;
+        let prevView = "view-home";
+
+        // ── ACCORDION BUILDER ──
+        function buildAccordion(p) {
+            const acc = document.getElementById("accordion");
+            acc.innerHTML = "";
+
+            const sections = [
+                { label: "Intro", html: buildIntro(p), open: true },
+                ...(p.roles.length || p.methods.length || p.collaborators.length
+                    ? [{ label: "Credits", html: buildCredits(p), open: false }] : []),
+                ...(p.texts.length
+                    ? [{ label: "Text", html: buildText(p), open: false }] : []),
+                { label: "Images", html: buildImages(p), open: false }
+            ];
+
+            sections.forEach(s => {
+                const el = document.createElement("div");
+                el.className = "acc-item" + (s.open ? " open" : "");
+                el.innerHTML = `
+      <button class="acc-trigger" onclick="this.closest('.acc-item').classList.toggle('open')">
+        <span>${s.label}</span>
+        <span class="acc-arrow">›</span>
+      </button>
+      <div class="acc-body">${s.html}</div>`;
+                acc.appendChild(el);
+            });
+        }
+
+        function buildIntro(p) {
+            let h = '<div class="intro-grid">';
+            if (p.location) h += `<div><div class="intro-label">Location</div><div class="intro-val">${p.location}</div></div>`;
+            if (p.year) h += `<div><div class="intro-label">Year</div><div class="intro-val">${p.year}</div></div>`;
+            if (p.tag) h += `<div><div class="intro-label">Type</div><div class="intro-val">${p.tag}</div></div>`;
+            h += '</div>';
+            return h;
+        }
+
+        function buildCredits(p) {
+            let h = '<div class="credits-grid">';
+            if (p.roles.length) h += `<div class="cred-block"><div class="cred-label">Role</div><div class="cred-val">${p.roles.join('<br>')}</div></div>`;
+            if (p.methods.length) h += `<div class="cred-block"><div class="cred-label">Methods</div><div class="cred-val">${p.methods.join('<br>')}</div></div>`;
+            h += '</div>';
+            if (p.collaborators.length) {
+                h += '<div class="credits-grid" style="margin-top:28px">';
+                p.collaborators.forEach(c => {
+                    h += `<div class="cred-block"><div class="cred-label">${c.label}</div><div class="cred-val">${c.names.join('<br>')}</div></div>`;
+                });
+                h += '</div>';
+            }
+            return h;
+        }
+
+        function buildText(p) {
+            return p.texts.map(t => `
+    <div class="text-body" style="margin-bottom:28px">${t.body.split(/\n\n+/).map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('')}</div>
+  `).join('');
+        }
+
+        function buildImages(p) {
+            if (!p.images.length) return `<div style="color:var(--muted);font-size:13px">— Images to be added —</div>`;
+            return `<div class="images-grid">${p.images.map((img, i) => {
+                const cls = i === 0 ? ' wide' : '';
+                return img.src
+                    ? `<div class="img-item${cls}" onclick="openLB('${img.src}')"><img src="${img.src}" alt="${img.caption}"></div>`
+                    : `<div class="img-item${cls}"><div class="img-placeholder">${img.caption}</div></div>`;
+            }).join('')}</div>`;
+        }
+
+        // ── LIGHTBOX ──
+        function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('open'); }
+        function closeLB() { document.getElementById('lightbox').classList.remove('open'); }
+        document.getElementById('lightbox').addEventListener('click', e => { if (e.target === e.currentTarget) closeLB(); });
+
+        // ── RENDER ──
+        function renderSidebar() {
+            document.getElementById("project-list").innerHTML = getFiltered().map(p =>
+                `<li class="proj-row ${activeId === p.id ? 'active' : ''}" onclick="openProject(${p.id})">
+      <span class="proj-name">${p.name}</span>
+      <span class="proj-year">${p.year}</span>
+    </li>`
+            ).join('');
+        }
+
+        function renderTable() {
+            document.getElementById("projects-table").innerHTML = getFiltered().map(p =>
+                `<div class="proj-table-row" onclick="openProject(${p.id})" style="padding-left:var(--pad);padding-right:var(--pad)">
+      <span class="pt-name">${p.name}</span>
+      <span class="pt-tag">${p.tag}</span>
+      <span class="pt-year">${p.year}</span>
+    </div>`
+            ).join('');
+        }
+
+        function renderCurrent() {
+            const items = currentIds.map(id => projects.find(p => p.id === id)).filter(Boolean);
+            document.getElementById("current-list").innerHTML = items.map(p =>
+                `<li class="current-item" onclick="openProject(${p.id})">
+      <div class="ci-left">
+        <span class="ci-name">${p.name}</span>
+        ${p.location ? `<span class="ci-where">${p.location}</span>` : ''}
+      </div>
+      <div class="ci-right">
+        <span class="ci-tag">${p.tag}</span>
+        <span class="ci-year">${p.year}</span>
+      </div>
+    </li>`
+            ).join('');
+        }
+
+        const getFiltered = () => activeTag === "all" ? projects : projects.filter(p => p.tag === activeTag);
+
+        // ── NAVIGATION ──
+        document.getElementById("tag-list").addEventListener("click", e => {
+            const btn = e.target.closest(".tag");
+            if (!btn) return;
+            activeTag = btn.dataset.tag;
+            document.querySelectorAll(".tag").forEach(t => t.classList.toggle("active", t === btn));
+            activeId = null;
+            renderSidebar(); renderTable();
+            setPage(activeTag === "all" ? "Projects" : activeTag);
+            document.getElementById("about-btn").classList.remove("active");
+            showView("view-projects");
+            prevView = "view-projects";
+        });
+
+        function openProject(id) {
+            const p = projects.find(x => x.id === id);
+            activeId = id;
+            renderSidebar();
+            document.getElementById("d-title").textContent = p.name;
+            document.getElementById("d-sub").textContent = `${p.tag} — ${p.year}${p.location ? ' — ' + p.location : ''}`;
+            const lk = document.getElementById("d-link");
+            lk.innerHTML = p.link ? `<a href="${p.link}" target="_blank" rel="noopener">${p.link}</a>` : '';
+            buildAccordion(p);
+            document.getElementById("content").scrollTop = 0;
+            document.getElementById("about-btn").classList.remove("active");
+            showView("view-detail");
+        }
+
+        function backFromDetail() {
+            activeId = null; renderSidebar();
+            prevView === "view-home" ? showHome() : (() => { setPage(activeTag === "all" ? "Projects" : activeTag); showView("view-projects"); })();
+        }
+
+        function showHome() {
+            activeId = null; renderSidebar();
+            setPage("Martin Wöllenstein");
+            document.getElementById("about-btn").classList.remove("active");
+            prevView = "view-home";
+            showView("view-home");
+        }
+
+        function showAbout() {
+            const btn = document.getElementById("about-btn");
+            if (btn.classList.contains("active")) { btn.classList.remove("active"); showHome(); }
+            else { btn.classList.add("active"); activeId = null; renderSidebar(); setPage("About"); showView("view-about"); }
+        }
+
+        function setPage(n) { document.getElementById("page-name").textContent = n; }
+
+        function showView(id) {
+            document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+            document.getElementById("topbar").classList.toggle("hidden", id === "view-detail");
+        }
+
+        // ── RESIZE ──
+        const sidebar = document.getElementById("sidebar");
+        const handle = document.getElementById("resize-handle");
+        let dragging = false, startX = 0, startW = 0;
+        handle.addEventListener("mousedown", e => { dragging = true; startX = e.clientX; startW = sidebar.offsetWidth; handle.classList.add("dragging"); document.body.style.cursor = "col-resize"; document.body.style.userSelect = "none"; });
+        document.addEventListener("mousemove", e => { if (!dragging) return; sidebar.style.width = Math.min(Math.max(startW + e.clientX - startX, 200), 480) + "px"; });
+        document.addEventListener("mouseup", () => { if (!dragging) return; dragging = false; handle.classList.remove("dragging"); document.body.style.cursor = ""; document.body.style.userSelect = ""; });
+
+        // ── INIT ──
+        renderCurrent(); renderSidebar(); renderTable();
+        showView("view-home");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Wöllenstein</title>
+    <style>
+        @font-face {
+            font-family: 'Unica';
+            src: url('./HGKBUnica77VIPBeta.ttf') format('truetype');
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Source';
+            src: url('./SourceSerifVariable-Roman.otf') format('opentype');
+            font-style: normal;
+        }
+
+        :root {
+            --font-ui: 'Unica', sans-serif;
+            --font-body: 'Source', serif;
+            --fv-ui: 'wght' 80;
+            --fv-ui_active: 'wght' 100;
+            --fv-body: 'wght' 500;
+
+            --size-ui: 24px;
+            --size-ui-md: 24px;
+            --size-ui-sm: 24px;
+            --bar-h: 48px;
+            --size-label: 14px;
+            --ls-label: 0.05em;
+            --size-body: 24px;
+
+            --c-talk: #c4b0f5;
+            --c-research: #f0b8d8;
+            --c-artwork: #7898f0;
+            --c-curating: #f0b070;
+            --c-exhibition: #f0e060;
+            --c-workshop: #80e0c0;
+            --c-publication: #e06860;
+            --c-text: #88ccf8;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            color: #000;
+            background: #fff;
+        }
+
+        /* ── LAYOUT ── */
+        #shell {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .col {
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: width 0.35s ease;
+        }
+
+        /* starting state: col-1 full width, col-2 hidden */
+        #col-1 {
+            width: 100%;
+        }
+
+        #col-2 {
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* open state: project panel slides in */
+        #col-1.open {
+            width: 40%;
+        }
+
+        #col-2.open {
+            width: 60%;
+            overflow-y: auto;
+        }
+
+        /* about: project list hides, col-2 goes full width */
+        #col-1.about {
+            width: 0;
+        }
+
+        #col-2.about {
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        .about-back-btn {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui-md);
+            font-variation-settings: var(--fv-ui);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        
+
+
+            .about-back-btn:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+        /* resize handle */
+        .handle {
+            /* width: 9px; */
+            flex-shrink: 0;
+            cursor: col-resize;
+            background: transparent;
+            display: block;
+            z-index: 10;
+            position: relative;
+        }
+
+        .handle::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 1px;
+            background: #000;
+        }
+
+        /* ── COL-1 ── */
+        #col-1-inner {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+
+        #col-1-header {
+            display: flex;
+            align-items: stretch;
+            height: var(--bar-h);
+            border-bottom: 1px solid #000;
+        }
+
+        #site-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            cursor: pointer;
+            width: 260px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* ── BOLD-HOVER: inner span starts normal, transitions to bold ── */
+        #site-title span {
+            font-variation-settings: var(--fv-ui);
+            transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
+        }
+        #site-title:hover span {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+
+        #header-about {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 12px 25px;
+            width: 140px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            white-space: nowrap;
+            transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
+        }
+        #header-about:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+
+        #filters {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .tag {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui-sm);
+            font-variation-settings: var(--fv-ui);
+            border: none;
+            cursor: pointer;
+            padding: 0 12px;
+            display: inline-grid;
+            align-items: center;
+            justify-items: center;
+            background: #fff;
+            color: #000;
+            transition: font-variation-settings 0.1s ease;
+            white-space: nowrap;
+        }
+
+        /* both the visible text and the bold ghost occupy the same grid cell —
+           ghost is invisible but reserves the bold width so layout never shifts */
+        .tag-full,
+        .tag-bold-ghost {
+            grid-area: 1 / 1;
+        }
+
+        .tag-bold-ghost {
+            font-variation-settings: var(--fv-ui_active);
+            visibility: hidden;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* .tag:hover {
+            font-variation-settings: var(--fv-ui_active);
+
+
+        } */
+
+
+        .tag[data-tag="Talk"]:hover { background: var(--c-talk); color: #fff; }
+        .tag[data-tag="Research"]:hover { background: var(--c-research); color: #fff; }
+        .tag[data-tag="Artwork"]:hover { background: var(--c-artwork); color: #fff; }
+        .tag[data-tag="Curating"]:hover { background: var(--c-curating); color: #fff; }
+        .tag[data-tag="Exhibition"]:hover { background: var(--c-exhibition); color: #fff; }
+        .tag[data-tag="Workshop"]:hover { background: var(--c-workshop); color: #fff; }
+        .tag[data-tag="Publication"]:hover { background: var(--c-publication); color: #fff; }
+        .tag[data-tag="Text"]:hover { background: var(--c-text); color: #fff; }
+
+        .tag:hover .tag-full {
+            font-variation-settings: var(--fv-ui_active);
+        }
+
+
+
+
+
+
+
+
+        .tag[data-tag="Talk"].active {
+            background: var(--c-talk);
+            color: #fff;
+        }
+
+        .tag[data-tag="Research"].active {
+            background: var(--c-research);
+            color: #fff;
+        }
+
+        .tag[data-tag="Artwork"].active {
+            background: var(--c-artwork);
+            color: #fff;
+        }
+
+        .tag[data-tag="Curating"].active {
+            background: var(--c-curating);
+            color: #fff;
+        }
+
+        .tag[data-tag="Exhibition"].active {
+            background: var(--c-exhibition);
+            color: #ffffff;
+        }
+
+        .tag[data-tag="Workshop"].active {
+            background: var(--c-workshop);
+            color: #ffffff;
+        }
+
+        .tag[data-tag="Publication"].active {
+            background: var(--c-publication);
+            color: #fff;
+        }
+
+        .tag[data-tag="Text"].active {
+            background: var(--c-text);
+            color: #fff;
+        }
+
+        /* collapsed 1-letter mode when project panel is open */
+        .tag-short {
+            display: none;
+        }
+
+        #col-1.open .tag-full,
+        #col-1.open .tag-bold-ghost {
+            display: none;
+        }
+
+        #col-1.open .tag-short {
+            display: block;
+        }
+
+        #col-1.open .tag {
+            flex: 1;
+            padding: 0;
+            justify-content: center;
+        }
+
+        #col-1.open #site-title {
+            width: 260px;
+            flex-shrink: 0;
+            padding: 12px 25px;
+        }
+
+        #col-1.open #header-about {
+            width: auto;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+
+        #col-1.open #filters {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* project rows */
+        .proj-row {
+            display: grid;
+            grid-template-columns: 50% 25% 15% 10%;
+            align-items: stretch;
+            height: var(--bar-h);
+            border-bottom: 1px solid #000;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .proj-row.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .proj-name,
+        .proj-location,
+        .proj-year {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui-sm);
+            font-variation-settings: var(--fv-ui);
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
+        }
+
+        .proj-row:hover .proj-name,
+        .proj-row:hover .proj-location,
+        .proj-row:hover .proj-year {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+
+        .proj-location,
+        .proj-year {
+            transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .proj-row:hover .proj-location,
+        .proj-row:hover .proj-year {
+            transform: translateX(25px);
+        }
+
+        .proj-row.active:hover {
+            background: #000;
+        }
+
+        .proj-row.active:hover .proj-location,
+        .proj-row.active:hover .proj-year {
+            transform: none;
+        }
+
+
+        .proj-name {
+            overflow: hidden;
+            min-width: 0;
+            position: relative;
+            transition: padding-left 0.1s ease;
+        }
+
+        .proj-name::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 9px;
+            height: 16px;
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+
+        .proj-row:hover .proj-name {
+            padding-left: 49px;
+        }
+
+        .proj-row:hover .proj-name::before {
+            opacity: 1;
+        }
+
+        .proj-row.active .proj-name {
+            padding-left: 49px;
+        }
+
+        .proj-row.active .proj-name::before {
+            opacity: 1;
+        }
+
+        .proj-name-text {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* .proj-location {
+            padding-left: 0;
+        } */
+
+        .proj-year {
+            padding-left: 0;
+            /* justify-content: flex-end; */
+            padding-right: 0;
+        }
+
+        /* narrow panel: name + color blocks */
+        #col-1.open .proj-row {
+            grid-template-columns: 1fr 0 0 66px;
+        }
+
+        #col-1.open .proj-tags {
+            padding-right: 0;
+        }
+
+        #col-1.open .proj-location,
+        #col-1.open .proj-year {
+            opacity: 0;
+            transform: translateX(30px);
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #col-1.open #filters {
+            opacity: 0;
+            transform: translateX(30px);
+            pointer-events: none;
+        }
+
+        .proj-num { display: none; }
+
+        #col-1.open .proj-row.active .proj-tag-block {
+            display: none;
+        }
+
+        .proj-tags {
+            display: flex;
+            align-items: stretch;
+            justify-content: flex-end;
+            padding-right: 25px;
+        }
+
+        .proj-tag-block {
+            width: 26px;
+            flex-shrink: 0;
+            transition: width 0.1s ease;
+        }
+
+        .proj-row:hover .proj-tag-block {
+            width: 13px;
+        }
+
+        .proj-row.active:hover .proj-tag-block {
+            width: 26px;
+        }
+
+        .proj-row.active .proj-tag-block {
+            opacity: 0;
+        }
+
+        /* ── COL-2 ── */
+        #case-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            height: var(--bar-h);
+            border-bottom: 1px solid #000;
+        }
+
+        #case-back {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: var(--bar-h);
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #case-back::before {
+            content: '';
+            width: 9px;
+            height: 16px;
+            clip-path: polygon(100% 0, 0 50%, 100% 100%);
+            background: currentColor;
+        }
+
+        .case-back-label {
+            display: none;
+        }
+
+        #case-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+        }
+
+        #case-filters {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .case-filter {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui-sm);
+            font-variation-settings: var(--fv-ui);
+            border: none;
+            cursor: pointer;
+            padding: 0 18px;
+            display: flex;
+            align-items: center;
+            background: #fff;
+            color: #000;
+
+            transition: font-variation-settings 0.1s ease, opacity 0.1s ease;
+            white-space: nowrap;
+        }
+
+        .case-filter:hover {
+            font-variation-settings: var(--fv-ui_active);
+            background: #000;
+            color: #fff;
+        }
+
+        .case-filter.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .case-filter {
+            display: inline-grid;
+        }
+
+        .cf-text,
+        .cf-ghost {
+            grid-area: 1 / 1;
+        }
+
+        .cf-ghost {
+            font-variation-settings: var(--fv-ui_active);
+            visibility: hidden;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* ── BLOCKS ── */
+        .block-text {
+            margin-bottom: -1px;
+        }
+
+        .block-description {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            padding: 12px 25px 3px 25px;
+            letter-spacing: var(--ls-label);
+            width: 100%;
+            border-top: 1px solid #000;
+        }
+
+        .block-images .block-description {
+            border-top: none;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .block-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            padding: 12px 25px 3px 25px;
+            border-top: 1px solid #000;
+            letter-spacing: var(--ls-label);
+        }
+
+        .project> :first-child>.block-title:first-child,
+        .project>.block-title:first-child,
+        .project>.block-images:first-child,
+        .project> :first-child>.block-description:first-child,
+        .project>.block-description:first-child {
+            border-top: none;
+        }
+
+        #about-content .block-title:first-of-type {
+            border-top: none;
+        }
+
+        /* ── CREDITS BLOCK ── */
+        .block-credits .block-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 0 25px 12px 25px;
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            line-height: 1.2;
+        }
+
+        .block-image-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            letter-spacing: var(--ls-label);
+            padding: 6px 25px 3px 0px;
+            width: 100%;
+        }
+
+        .block-text .block-body {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            line-height: 1.2;
+            padding: 0 75px 12px 25px;
+        }
+
+        .block-text .block-body p {
+            margin-bottom: 12px;
+        }
+
+        .block-text .block-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .block-images {
+            margin-top: -1px;
+            position: relative;
+            display: grid;
+            gap: 8px;
+            padding: 12px 25px;
+            border-top: 1px solid #000;
+        }
+
+        .block-images .img-wrap {
+            aspect-ratio: 3/2;
+            overflow: hidden;
+        }
+
+        .block-images .img-wrap img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+
+        .block.hidden {
+            display: none;
+        }
+
+      
+        .project-footer {
+            margin-top: 20%;
+        }
+
+      
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--bar-h);
+            padding: 0 25px;
+            border-top: 1px solid #000;
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            letter-spacing: var(--ls-label);
+            color: #000000;
+        }
+
+        /* ── ABOUT ── */
+        #case-empty {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+        }
+
+        .about-heading {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            padding: 12px 25px;
+        }
+
+        .about-body {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            line-height: 1.2;
+            padding: 0 25px 25px 25px;
+        }
+
+        .about-body p {
+            margin-bottom: 16px;
+        }
+
+        .about-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .about-col {
+            min-width: 0;
+            border-bottom: 1px solid #000;
+        }
+
+        .about-exhibitions {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            line-height: 1.2;
+            padding: 0 25px 25px 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .about-links {
+            padding: 0 25px 25px 25px;
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            display: flex;
+            flex-direction: column;
+            /* gap: 6px; */
+            line-height: 1.2;
+        }
+
+        .about-links a {
+            color: #000;
+            text-decoration: none;
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            position: relative;
+            padding-left: 0;
+            transition: padding-left 0.1s ease;
+        }
+
+        .about-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 11px;
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+
+        .about-links a:hover {
+            padding-left: 18px;
+        }
+
+        .about-links a:hover::before {
+            opacity: 1;
+        }
+
+        .about-cv-btn {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui-md);
+            font-variation-settings: var(--fv-ui);
+            background: none;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
+        }
+
+        .about-cv-btn:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+
+        #about-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            height: var(--bar-h);
+            border-bottom: 1px solid #000;
+        }
+
+        #about-header + .block-title {
+            border-top: none;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            :root {
+                --size-ui: 20px;
+                --size-ui-md: 20px;
+                --size-ui-sm: 20px;
+                --size-label: 12px;
+                --bar-h: 40px;
+            }
+
+            .proj-name,
+            .proj-location,
+            .proj-year {
+                padding: 0 20px;
+            }
+
+            .proj-tags {
+                padding-right: 20px;
+            }
+
+            .proj-name::before {
+                left: 20px;
+            }
+
+            .proj-row:hover .proj-name,
+            .proj-row.active .proj-name {
+                padding-left: 44px;
+            }
+
+            .proj-tag-block {
+                width: 20px;
+            }
+
+            .proj-row:hover .proj-tag-block {
+                width: 10px;
+            }
+
+            #site-title {
+                padding: 0 20px;
+            }
+
+            #header-about {
+                padding: 0 20px;
+            }
+
+            .about-back-btn {
+                padding: 0 20px;
+            }
+
+            #col-1-header {
+                flex-wrap: wrap;
+                height: auto;
+                border-bottom: none;
+            }
+
+            #site-title {
+                order: 1;
+                flex: 1;
+                width: auto;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+            }
+
+            #header-about {
+                order: 2;
+                width: auto;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+            }
+
+            #filters {
+                order: 3;
+                width: 100%;
+                flex-basis: 100%;
+                height: auto;
+                border-bottom: none;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                padding: 0;
+                overflow-x: visible;
+            }
+
+            #filters .tag {
+                flex: 0 0 25%;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+                padding: 0 4px;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            #filters .tag {
+                padding: 0 10px;
+                flex-shrink: 0;
+            }
+
+            .col {
+                transition: width 0.35s ease, opacity 0.35s ease;
+            }
+
+            #col-1.open,
+            #col-1.about {
+                width: 0;
+            }
+
+            #col-2.open {
+                width: 100%;
+            }
+
+            #case-topbar {
+                flex-wrap: wrap;
+                height: auto;
+                border-bottom: none;
+            }
+
+            #case-back {
+                display: flex;
+                width: auto;
+                padding: 0 17px;
+                gap: 10px;
+                justify-content: flex-start;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+            }
+
+            #case-back::before {
+                position: static;
+                transform: none;
+                flex-shrink: 0;
+            }
+
+            .case-back-label {
+                display: block;
+                font-family: var(--font-ui);
+                font-size: var(--size-ui-sm);
+                font-variation-settings: var(--fv-ui);
+            }
+
+            #case-filters {
+                order: 2;
+                flex: 1;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+                justify-content: flex-end;
+            }
+
+            #case-title {
+                order: 3;
+                width: 100%;
+                height: var(--bar-h);
+                border-bottom: 1px solid #000;
+                padding: 0 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            .proj-row {
+                grid-template-columns: 1fr 66px;
+            }
+
+            .proj-location,
+            .proj-year {
+                display: none;
+            }
+
+            .block-text .block-body {
+                padding: 0 20px 12px 20px;
+            }
+
+            .block-credits .block-body {
+                grid-template-columns: 1fr;
+            }
+
+            .block-description{
+                padding: 12px 20px 3px 20px;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .block-credits .block-body {
+            
+            padding: 0 20px 12px 20px;
+            
+        }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="shell">
+
+        <!-- COL-1: project list -->
+        <div class="col" id="col-1">
+            <div id="col-1-inner">
+                <div id="col-1-header">
+                    <div id="site-title" onclick="reset()"><span>Martin Wöllenstein</span></div>
+                    <div id="filters">
+                        <button class="tag" data-tag="Talk"><span class="tag-full">Talk</span><span
+                                class="tag-bold-ghost">Talk</span><span class="tag-short">T</span></button>
+                        <button class="tag" data-tag="Research"><span class="tag-full">Research</span><span
+                                class="tag-bold-ghost">Research</span><span class="tag-short">R</span></button>
+                        <button class="tag" data-tag="Artwork"><span class="tag-full">Artwork</span><span
+                                class="tag-bold-ghost">Artwork</span><span class="tag-short">A</span></button>
+                        <button class="tag" data-tag="Curating"><span class="tag-full">Curating</span><span
+                                class="tag-bold-ghost">Curating</span><span class="tag-short">C</span></button>
+                        <button class="tag" data-tag="Exhibition"><span class="tag-full">Exhibition</span><span
+                                class="tag-bold-ghost">Exhibition</span><span class="tag-short">E</span></button>
+                        <button class="tag" data-tag="Workshop"><span class="tag-full">Workshop</span><span
+                                class="tag-bold-ghost">Workshop</span><span class="tag-short">W</span></button>
+                        <button class="tag" data-tag="Publication"><span class="tag-full">Publication</span><span
+                                class="tag-bold-ghost">Publication</span><span class="tag-short">P</span></button>
+                        <button class="tag" data-tag="Text"><span class="tag-full">Text</span><span
+                                class="tag-bold-ghost">Text</span><span class="tag-short">T</span></button>
+                    </div>
+                    <button id="header-about" onclick="openAbout()">About</button>
+                </div>
+                <div id="projects-list"></div>
+                <div class="project-footer" style="margin-top:0; border-top:none">
+                    <span>Updated 2026</span>
+                    <span>Design by Nik</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="handle" id="handle-1" style="display:none;"></div>
+
+
+        <div class="col" id="col-2">
+
+            <div id="case-empty" style="display:none;">
+                <div id="about-content">
+                    <div id="about-header">
+                        <button class="about-back-btn" onclick="reset()">Martin Wöllenstein</button>
+                        <a class="about-cv-btn" href="./images/Artist_CV_Martin_Woellenstein_2026.pdf" download>Download CV</a>
+                    </div>
+                    <div class="about-grid">
+                        <div class="about-col">
+                            <div class="block-title">Bio</div>
+                            <div class="about-body">
+                                <p>Martin Wöllenstein (b. 1991, Germany) is a visual artist and researcher.</p>
+                                <p>He studied Fine Arts at Burg Giebiechenstein University of Art and Design Halle, Saale
+                                    (Germany)
+                                    and at Universidad de las Artes, Havana (Cuba) and Transversal Design at the Academy of
+                                    Art and Design, Basel (Switzerland).</p>
+                                <p>Martin co-founded the artist collective VIVA Comunidad Creativa in Cuba (2017) the
+                                    creative platform Nnoboa Space in Ghana (2023) and is a frequent collaborator of the
+                                    Berlin-based, zero-waste fashion label IMPARI.</p>
+                            </div>
+                        </div>
+                        <div class="about-col">
+                            <div class="block-title">Exhibitions</div>
+                            <div class="about-exhibitions">
+                                <span>Berlin Fashion Week, 2026</span>
+                                <span>CIVIC, Basel, 2025</span>
+                                <span>Perve Galeria, Lisbon, 2025</span>
+                                <span>Goethe Institute, Accra, 2025</span>
+                                <span>Artco Gallery, Berlin, 2024</span>
+                                <span>Villa Medici, Rome, 2024</span>
+                                <span>Nubuke Foundation, Accra, 2023</span>
+                                <span>Havana Biennial, 2015</span>
+                            </div>
+                        </div>
+                        <div class="about-col">
+                            <div class="block-title">Education</div>
+                            <div class="about-exhibitions">
+                                <span>HGK, 2024-2026</span>
+                                <span>Different school</span>
+                            </div>
+                        </div>
+                        <div class="about-col">
+                            <div class="block-title">Contact</div>
+                            <div class="about-links">
+                                <a href="mailto:mail@martinwoellenstein.com">martin.woellenstein(at)gmail.com</a>
+                                <a href="https://instagram.com/martinwoellenstein" target="_blank">Instagram</a>
+                                <a href="https://martinwoellenstein.com" target="_blank">martinwoellenstein.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="case-topbar" style="display:none;">
+                <button id="case-back" onclick="reset()"><span class="case-back-label">Back</span></button>
+                <div id="case-title"></div>
+                <div id="case-filters">
+                    <button class="case-filter active" data-filter="all" onclick="filterCase('all')"><span
+                            class="cf-text">All</span><span class="cf-ghost">All</span></button>
+                    <button class="case-filter" data-filter="text" onclick="filterCase('text')"><span
+                            class="cf-text">Text</span><span class="cf-ghost">Text</span></button>
+                    <button class="case-filter" data-filter="images" onclick="filterCase('images')"><span
+                            class="cf-text">Images</span><span class="cf-ghost">Images</span></button>
+                </div>
+            </div>
+
+
+            <div id="projects-content">
+            </div>
+
+        </div><!-- #col-2 -->
+    </div><!-- #shell -->
+
+    <script>
+        const SANITY_PROJECT_ID = '1uk7glr5';
+        const SANITY_DATASET = 'production';
+        const SANITY_TOKEN = 'skJgM39jVueFEVB1dFkXRgceCeFogPCuGtrXD9O69qrRhTdho5kHHHcOO0mX1hh1p5N1yDa6hklDWTMzWmefVheY2hfZzVE5X2U6gF4eIetu57fiQZ9yzAGmNpd7PqZuQZCG5xceIC6wqIEgmDnbYkVa3ZWWrb5PTDDZNzp1Y9Hf189YWwu2';
+
+        const TAG_ORDER = ['Talk', 'Research', 'Artwork', 'Curating', 'Exhibition', 'Workshop', 'Publication', 'Text'];
+        const tagColors = {
+            Talk: 'var(--c-talk)', Research: 'var(--c-research)', Artwork: 'var(--c-artwork)',
+            Curating: 'var(--c-curating)', Exhibition: 'var(--c-exhibition)', Workshop: 'var(--c-workshop)',
+            Publication: 'var(--c-publication)', Text: 'var(--c-text)'
+        };
+
+        let sections = [];
+        let activeIndex = null;
+        const activeTags = new Set();
+
+        /* ── SANITY HELPERS ── */
+        function sanityImageUrl(ref) {
+            return `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${ref.replace('image-', '').replace(/-(\w+)$/, '.$1')}`;
+        }
+
+        async function fetchProjects() {
+            const query = encodeURIComponent('*[_type == "project"] | order(year desc)');
+            const url = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${SANITY_DATASET}?query=${query}`;
+            const res = await fetch(url, { headers: { Authorization: `Bearer ${SANITY_TOKEN}` } });
+            const data = await res.json();
+            return data.result;
+        }
+
+        function renderBlock(block) {
+            if (block._type === 'textBlock') {
+                const paras = (block.body || '').split('\n').filter(l => l.trim())
+                    .map(l => `<p>${l}</p>`).join('');
+                return `<div class="block block-text" data-type="text">
+                    ${block.description ? `<div class="block-description">${block.description}</div>` : ''}
+                    <div class="block-body">${paras}</div>
+                </div>`;
+            }
+            if (block._type === 'creditsBlock') {
+                const items = (block.body || '').split('\n').filter(l => l.trim())
+                    .map(l => `<span>${l}</span>`).join('');
+                return `<div class="block block-credits" data-type="credits">
+                    ${block.description ? `<div class="block-description">${block.description}</div>` : ''}
+                    <div class="block-body">${items}</div>
+                </div>`;
+            }
+            if (block._type === 'imageBlock') {
+                const imgs = (block.images || []).map(img => {
+                    const ref = img.image?.asset?._ref || img.asset?._ref;
+                    if (!ref) return '';
+                    return `${img.caption ? `<div class="block-image-title">${img.caption}</div>` : ''}
+                        <div class="img-wrap"><img src="${sanityImageUrl(ref)}" alt=""></div>`;
+                }).join('');
+                return `<div class="block block-images" data-type="images">
+                    ${block.description ? `<div class="block-description">${block.description}</div>` : ''}
+                    ${imgs}
+                </div>`;
+            }
+            return '';
+        }
+
+        /* ── INIT: fetch from Sanity, render, then set up sidebar ── */
+        async function init() {
+            const projects = await fetchProjects();
+            const content = document.getElementById('projects-content');
+
+            projects.forEach(p => {
+                const el = document.createElement('section');
+                el.className = 'project';
+                el.dataset.name = p.name || '';
+                el.dataset.location = p.city || '';
+                el.dataset.year = p.year || '';
+                el.dataset.tags = JSON.stringify(p.tags || []);
+                el.innerHTML = (p.blocks || []).map(renderBlock).join('');
+                content.appendChild(el);
+            });
+
+            sections = Array.from(document.querySelectorAll('.project'));
+            sections.forEach((s, i) => {
+                s.style.display = 'none';
+                const num = String(sections.length - i).padStart(2, '0');
+                const tags = JSON.parse(s.dataset.tags || '[]').join(', ');
+                s.insertAdjacentHTML('beforeend', `
+                    <div class="project-footer">
+                        <span>Project ${num}</span>
+                        <span>${tags}</span>
+                    </div>`);
+            });
+
+            document.getElementById('about-content').insertAdjacentHTML('beforeend', `
+                <div class="project-footer">
+                    <span>Updated 2026</span>
+                    <span>Design by Nik</span>
+                </div>`);
+
+            document.getElementById('projects-list').innerHTML = sections.map((s, i) => {
+                const tags = JSON.parse(s.dataset.tags || '[]')
+                    .sort((a, b) => TAG_ORDER.indexOf(a) - TAG_ORDER.indexOf(b))
+                    .slice(0, 3);
+                const tagBlocks = tags.map(t =>
+                    `<span class="proj-tag-block" data-tag="${t}" style="background:${tagColors[t] || '#ccc'}"></span>`
+                ).join('');
+                const num = String(sections.length - i).padStart(2, '0');
+                return `<div class="proj-row" data-index="${i}" onclick="openProject(${i})">
+                    <span class="proj-name"><span class="proj-name-text">${s.dataset.name}</span></span>
+                    <span class="proj-location">${s.dataset.location || ''}</span>
+                    <span class="proj-year">${s.dataset.year}</span>
+                    <span class="proj-tags">${tagBlocks}<span class="proj-num">${num}</span></span>
+                </div>`;
+            }).join('');
+        }
+
+        /* ── LEFT TAG FILTER (multi-select) ── */
+        document.getElementById('filters').addEventListener('click', e => {
+            const btn = e.target.closest('.tag');
+            if (!btn) return;
+            const tag = btn.dataset.tag;
+            if (activeTags.has(tag)) {
+                activeTags.delete(tag);
+                btn.classList.remove('active');
+            } else {
+                activeTags.add(tag);
+                btn.classList.add('active');
+                if (activeTags.size > 3) {
+                    const first = activeTags.values().next().value;
+                    activeTags.delete(first);
+                    document.querySelector(`.tag[data-tag="${first}"]`).classList.remove('active');
+                }
+            }
+            updateSidebar();
+        });
+
+        function updateSidebar() {
+            document.querySelectorAll('.proj-row').forEach(row => {
+                const sec = sections[+row.dataset.index];
+                const tags = JSON.parse(sec.dataset.tags || '[]');
+                row.style.display = (activeTags.size === 0 || [...activeTags].every(t => tags.includes(t))) ? '' : 'none';
+
+                const container = row.querySelector('.proj-tags');
+                const blocks = [...container.querySelectorAll('.proj-tag-block')];
+                const activeList = [...activeTags];
+                const getOrder = t => {
+                    const ai = activeList.indexOf(t);
+                    if (ai === 0) return 2;
+                    if (ai === 1) return 1;
+                    return 0;
+                };
+                blocks.sort((a, b) => {
+                    const oa = getOrder(a.dataset.tag), ob = getOrder(b.dataset.tag);
+                    if (oa !== ob) return oa - ob;
+                    return TAG_ORDER.indexOf(a.dataset.tag) - TAG_ORDER.indexOf(b.dataset.tag);
+                }).forEach(b => {
+                    b.style.display = '';
+                    b.style.marginRight = '';
+                    container.appendChild(b);
+                });
+            });
+        }
+
+        /* ── OPEN / CLOSE COLUMNS ── */
+        function openCols() {
+            const c1 = document.getElementById('col-1');
+            const c2 = document.getElementById('col-2');
+            c1.classList.remove('about');
+            c2.classList.remove('about');
+            c1.classList.add('open');
+            c2.classList.add('open');
+            document.getElementById('handle-1').style.display = '';
+        }
+
+        function closeCols() {
+            const c1 = document.getElementById('col-1');
+            const c2 = document.getElementById('col-2');
+            c1.classList.remove('open', 'about');
+            c2.classList.remove('open', 'about');
+            c1.style.width = '';
+            c2.style.width = '';
+            document.getElementById('handle-1').style.display = 'none';
+        }
+
+        function openAboutCols() {
+            const c1 = document.getElementById('col-1');
+            const c2 = document.getElementById('col-2');
+            c1.classList.remove('open');
+            c2.classList.remove('open');
+            c1.classList.add('about');
+            c2.classList.add('about');
+            document.getElementById('handle-1').style.display = window.innerWidth <= 768 ? '' : 'none';
+        }
+
+        /* ── OPEN PROJECT ── */
+        function openProject(i) {
+            if (activeIndex === i) { reset(); return; }
+            activeIndex = i;
+            openCols();
+
+            document.querySelectorAll('.proj-row').forEach(r =>
+                r.classList.toggle('active', +r.dataset.index === i));
+
+            document.getElementById('case-title').textContent = sections[i].dataset.name;
+
+            sections.forEach(s => s.style.display = 'none');
+            sections[i].style.display = 'block';
+
+            document.getElementById('case-topbar').style.display = '';
+            document.getElementById('case-empty').style.display = 'none';
+            document.getElementById('header-about').style.display = 'none';
+
+            filterCase('all');
+            document.getElementById('col-2').scrollTop = 0;
+        }
+
+        /* ── CASE FILTER (text / images / all) ── */
+        function filterCase(type) {
+            document.querySelectorAll('.case-filter').forEach(b =>
+                b.classList.toggle('active', b.dataset.filter === type));
+            if (activeIndex === null) return;
+            sections[activeIndex].querySelectorAll('.block').forEach(block => {
+                const t = block.dataset.type;
+                const visible = type === 'all' || t === type || (type === 'text' && t === 'credits');
+                block.classList.toggle('hidden', !visible);
+            });
+        }
+
+        /* ── ABOUT ── */
+        function openAbout() {
+            activeIndex = null;
+            openAboutCols();
+            document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+            sections.forEach(s => s.style.display = 'none');
+            document.getElementById('case-topbar').style.display = 'none';
+            document.getElementById('header-about').style.display = 'none';
+            document.getElementById('case-empty').style.display = 'block';
+        }
+
+        /* ── RESET ── */
+        function reset() {
+            activeIndex = null;
+            closeCols();
+            document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+            sections.forEach(s => s.style.display = 'none');
+            document.getElementById('case-topbar').style.display = 'none';
+            document.getElementById('header-about').style.display = '';
+            document.getElementById('case-empty').style.display = 'none';
+            activeTags.clear();
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            updateSidebar();
+        }
+
+        /* ── RESIZE HANDLE ── */
+        (function () {
+            const handle = document.getElementById('handle-1');
+            const left = document.getElementById('col-1');
+            const right = document.getElementById('col-2');
+            let drag = false, startX = 0, startL = 0;
+
+            handle.addEventListener('mousedown', e => {
+                if (!right.offsetWidth) return;
+                drag = true; startX = e.clientX; startL = left.offsetWidth;
+                handle.style.background = 'rgba(0,0,0,0.08)';
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', e => {
+                if (!drag) return;
+                const total = left.offsetWidth + right.offsetWidth;
+                const minPx = total * 0.20;
+                const maxPx = total * 0.80;
+                const newLeft = Math.min(maxPx, Math.max(minPx, startL + e.clientX - startX));
+                left.style.width = newLeft + 'px';
+                right.style.width = (total - newLeft) + 'px';
+                left.style.transition = right.style.transition = 'none';
+            });
+            document.addEventListener('mouseup', () => {
+                if (!drag) return; drag = false;
+                handle.style.background = '';
+                document.body.style.cursor = document.body.style.userSelect = '';
+                left.style.transition = right.style.transition = '';
+            });
+        })();
+
+        init();
+    </script>
+</body>
+
+</html>

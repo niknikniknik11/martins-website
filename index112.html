@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martins Website</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&family=Inter+Tight:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --pad: 25px;
+            --bg: #ffffff;
+            --sidebar-bg: #e4e4e4;
+            --text: #0a0a0a;
+            --muted: #777;
+            --border: #c8c8c8;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            border: 1px solid #000;
+        }
+
+        /* ══ SIDEBAR ══ */
+        #sidebar {
+            width: 33%;
+            min-width: 200px;
+            max-width: 480px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #sidebar-inner {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--pad);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            scrollbar-width: none;
+        }
+
+        #sidebar-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .s-title {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(20px, 2.8vw, 32px);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 5px;
+        }
+
+        .s-sub {
+            font-size: 11px;
+            font-style: italic;
+            color: var(--muted);
+            margin-bottom: 20px;
+            font-family: 'Inter Tight', sans-serif;
+        }
+
+        .s-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 22px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 9px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.1s;
+            line-height: 1.6;
+        }
+
+        .tag:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        .tag.active {
+            background: var(--text);
+            color: #fff;
+            border-color: var(--text);
+        }
+
+        .s-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .proj-list {
+            list-style: none;
+        }
+
+        .proj-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 8px 0;
+            /* border-bottom: 1px solid rgba(0, 0, 0, 0.09); */
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .proj-row:hover {
+            opacity: 0.5;
+        }
+
+        .proj-row.active .proj-name {
+            font-weight: 700;
+        }
+
+        .proj-name {
+            font-size: 13px;
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 400;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .proj-year {
+            font-size: 12px;
+            color: var(--muted);
+            flex-shrink: 0;
+            margin-left: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Resize handle */
+        #resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 20;
+        }
+
+        #resize-handle:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        #resize-handle.dragging {
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        /* ══ MAIN ══ */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        #topbar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: var(--pad) var(--pad) 16px var(--pad);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        #page-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(16px, 2vw, 22px);
+            letter-spacing: -0.02em;
+        }
+
+        #about-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            text-transform: uppercase;
+            transition: opacity 0.1s;
+        }
+
+        #about-btn:hover {
+            opacity: 0.4;
+        }
+
+        #about-btn.active {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--pad);
+            padding-top: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadein 0.18s ease;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Projects table ── */
+        .proj-table-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 24px;
+            align-items: baseline;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .proj-table-row:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .proj-table-row:hover {
+            opacity: 0.45;
+        }
+
+        .pt-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(14px, 1.6vw, 19px);
+            letter-spacing: -0.02em;
+        }
+
+        .pt-tag {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .pt-year {
+            font-size: 12px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Detail ── */
+        #detail-back {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            padding: 0;
+            margin-bottom: 22px;
+            display: inline-block;
+            text-transform: uppercase;
+            transition: color 0.1s;
+        }
+
+        #detail-back:hover {
+            color: var(--text);
+        }
+
+        #detail-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 22px;
+        }
+
+        #detail-title {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(22px, 3vw, 38px);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        #detail-meta {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 22px;
+        }
+
+        #detail-desc {
+            font-size: 14px;
+            line-height: 1.75;
+            color: #333;
+            max-width: 580px;
+        }
+
+        /* ── About ── */
+        #view-about {
+            max-width: 540px;
+        }
+
+        .about-name {
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: clamp(26px, 4vw, 46px);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .about-role {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            margin-bottom: 28px;
+        }
+
+        #view-about p {
+            font-size: 14px;
+            line-height: 1.78;
+            color: #333;
+            margin-bottom: 14px;
+        }
+
+        .about-links {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .about-link {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--text);
+            padding-bottom: 1px;
+            transition: opacity 0.1s;
+        }
+
+        .about-link:hover {
+            opacity: 0.4;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <nav id="sidebar">
+            <div id="sidebar-inner">
+                <div class="s-title">Martin Wöllenstein</div>
+                <div class="s-sub">Portfolio website of Martin Wöllenstein</div>
+
+                <div class="s-label"></div>
+                <div class="tag-row" id="tag-list">
+                    <button class="tag active" data-tag="all">All</button>
+                    <button class="tag" data-tag="Talk">Talk</button>
+                    <button class="tag" data-tag="Research">Research</button>
+                    <button class="tag" data-tag="Artwork">Artwork </button>
+                    <button class="tag" data-tag="Curating">Curating </button>
+                    <button class="tag" data-tag="Exhibition">Exhibition </button>
+                    <button class="tag" data-tag="Workshop">Workshop</button>
+                    <button class="tag" data-tag="Publication">Publication </button>
+                    <button class="tag" data-tag="Text">Text </button>
+                </div>
+
+                <hr class="s-divider">
+                <ul class="proj-list" id="project-list"></ul>
+            </div>
+            <div id="resize-handle"></div>
+        </nav>
+
+        <div id="main">
+            <div id="topbar">
+                <div id="page-name">Projects</div>
+                <button id="about-btn" onclick="showAbout()">About</button>
+            </div>
+            <div id="content">
+
+                <div id="view-projects" class="view active">
+                    <div id="projects-table"></div>
+                </div>
+
+                <div id="view-detail" class="view">
+                    <button id="detail-back" onclick="backToProjects()">← Back</button>
+                    <div id="detail-img"></div>
+                    <div id="detail-title"></div>
+                    <div id="detail-meta"></div>
+                    <div id="detail-desc"></div>
+                </div>
+
+                <div id="view-about" class="view">
+                    <div class="about-name">Martin<br>Wöllenstein</div>
+                    <div class="about-role">some info</div>
+                    <p>I'm a designer and developer building thoughtful digital experiences. I work across visual
+                        identity, web, and motion — always starting from the idea, not the tool.</p>
+                    <p>Currently based in [City], open to freelance projects and collaborations.</p>
+                    <div class="about-links">
+                        
+                        <a class="about-link" href="#">CV ↓</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            { id: 1, name: "In between worlds", year: "2025", tag: "branding", desc: "Complete visual identity for a Berlin-based architecture studio. Wordmark, color system, stationery, and digital guidelines across all touchpoints." },
+            { id: 2, name: "Flowtype App", year: "2025", tag: "web", desc: "UI/UX design and frontend development for a SaaS writing tool. Focused on distraction-free editing and accessibility." },
+            { id: 3, name: "Riso Annual", year: "2024", tag: "print", desc: "Two-color risograph-printed annual report for a nonprofit. Designed for warmth and legibility with constrained resources." },
+            { id: 4, name: "Kinetic Titles", year: "2024", tag: "motion", desc: "Motion graphics package for a documentary series. Title cards, lower thirds, and transitions designed in After Effects." },
+            { id: 5, name: "Atelier Web", year: "2023", tag: "web", desc: "Bespoke portfolio website for a luxury interior design studio. Built with smooth scroll, custom cursor, and image transitions." },
+            { id: 6, name: "Fold Magazine", year: "2023", tag: "print", desc: "Art direction and layout design for an independent culture magazine, issues 4–7." },
+            { id: 7, name: "Merge Rebrand", year: "2022", tag: "branding", desc: "Full rebrand for a fintech startup going through an acquisition. Logo, brand voice, and pitch deck templates." },
+            { id: 8, name: "Loop Reel", year: "2022", tag: "motion", desc: "A personal motion experiment exploring seamless loops and texture through frame-by-frame animation." },
+            { id: 9, name: "Grids Zine", year: "2021", tag: "print", desc: "Self-published zine exploring grid systems in design history. 48 pages, hand-distributed at design fairs." },
+            { id: 10, name: "Petal Identity", year: "2021", tag: "branding", desc: "Brand identity for an independent florist. Logo, packaging, and social media templates." },
+            { id: 11, name: "Canvas CMS", year: "2020", tag: "web", desc: "Frontend design system and CMS interface for a content agency. Built in React with full dark mode." },
+        ];
+
+        let activeTag = "all";
+        let activeId = null;
+
+        const getFiltered = () => activeTag === "all" ? projects : projects.filter(p => p.tag === activeTag);
+
+        function renderSidebar() {
+            document.getElementById("project-list").innerHTML = getFiltered().map(p => `
+      <li class="proj-row ${activeId === p.id ? 'active' : ''}" onclick="openProject(${p.id})">
+        <span class="proj-name">${p.name}</span>
+        <span class="proj-year">${p.year}</span>
+      </li>
+    `).join("");
+        }
+
+        function renderTable() {
+            document.getElementById("projects-table").innerHTML = getFiltered().map(p => `
+      <div class="proj-table-row" onclick="openProject(${p.id})">
+        <span class="pt-name">${p.name}</span>
+        <span class="pt-tag">${p.tag}</span>
+        <span class="pt-year">${p.year}</span>
+      </div>
+    `).join("");
+        }
+
+        document.getElementById("tag-list").addEventListener("click", e => {
+            const btn = e.target.closest(".tag");
+            if (!btn) return;
+            activeTag = btn.dataset.tag;
+            document.querySelectorAll(".tag").forEach(t => t.classList.toggle("active", t === btn));
+            activeId = null;
+            renderSidebar();
+            renderTable();
+            setPageName(activeTag === "all" ? "Projects" : activeTag.charAt(0).toUpperCase() + activeTag.slice(1));
+            document.getElementById("about-btn").classList.remove("active");
+            showView("view-projects");
+        });
+
+        function openProject(id) {
+            const p = projects.find(x => x.id === id);
+            activeId = id;
+            renderSidebar();
+            document.getElementById("detail-img").textContent = p.emoji;
+            document.getElementById("detail-title").textContent = p.name;
+            document.getElementById("detail-meta").textContent = `${p.tag.toUpperCase()} — ${p.year}`;
+            document.getElementById("detail-desc").textContent = p.desc + " Proin vel augue non nisi posuere feugiat. Sed eleifend velit at diam facilisis, id lacinia erat commodo. Vivamus condimentum diam eget urna viverra, vel tincidunt urna dignissim.";
+            setPageName(p.name);
+            document.getElementById("about-btn").classList.remove("active");
+            showView("view-detail");
+        }
+
+        function backToProjects() {
+            activeId = null;
+            renderSidebar();
+            setPageName(activeTag === "all" ? "Projects" : activeTag.charAt(0).toUpperCase() + activeTag.slice(1));
+            showView("view-projects");
+        }
+
+        function showAbout() {
+            const btn = document.getElementById("about-btn");
+            if (btn.classList.contains("active")) {
+                btn.classList.remove("active");
+                activeId = null;
+                renderSidebar();
+                setPageName("Projects");
+                showView("view-projects");
+            } else {
+                btn.classList.add("active");
+                activeId = null;
+                renderSidebar();
+                setPageName("About");
+                showView("view-about");
+            }
+        }
+
+        function setPageName(name) { document.getElementById("page-name").textContent = name; }
+        function showView(id) { document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id)); }
+
+        // Resize
+        const sidebar = document.getElementById("sidebar");
+        const handle = document.getElementById("resize-handle");
+        let dragging = false, startX = 0, startW = 0;
+
+        handle.addEventListener("mousedown", e => {
+            dragging = true; startX = e.clientX; startW = sidebar.offsetWidth;
+            handle.classList.add("dragging");
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+        });
+        document.addEventListener("mousemove", e => {
+            if (!dragging) return;
+            sidebar.style.width = Math.min(Math.max(startW + e.clientX - startX, 200), 480) + "px";
+        });
+        document.addEventListener("mouseup", () => {
+            if (!dragging) return;
+            dragging = false;
+            handle.classList.remove("dragging");
+            document.body.style.cursor = "";
+            document.body.style.userSelect = "";
+        });
+
+        renderSidebar();
+        renderTable();
+    </script>
+</body>
+
+</html>

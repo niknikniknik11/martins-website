@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin Wöllenstein</title>
+<style>
+@font-face {
+  font-family: 'Unica';
+  src: url('./HGKBUnica77VIPBeta.ttf') format('truetype');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Minion';
+  src: url('./MinionVariableConcept-Roman.otf') format('opentype');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Minion';
+  src: url('./MinionVariableConcept-Italic.otf') format('opentype');
+  font-style: italic;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Minion', Georgia, serif;
+  font-size: 24px;
+  color: #000;
+  background: #fff;
+}
+
+/* ── LAYOUT ── */
+#shell { display: flex; height: 100vh; overflow: hidden; }
+
+.col { overflow-y: auto; flex-shrink: 0; transition: width 0.25s ease; }
+
+#col-1 { width: 33%; border-right: 1px solid #000; }
+#col-2 { width: 67%; }
+
+#col-1.split { width: 33%; }
+#col-2.split { width: 67%; }
+
+/* resize handle */
+.handle {
+  width: 10px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  display: block;
+  z-index: 10;
+}
+
+/* ── COL-1 ── */
+#col-1-inner { display: flex; flex-direction: column; height: 100%; }
+
+#col-1-header { padding: 25px 25px 15px 25px; }
+
+#site-title {
+  font-family: 'Unica', sans-serif;
+  font-size: 40px;
+  font-weight: normal;
+  line-height: 1.1;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+#site-title:hover { opacity: 0.5; }
+
+#filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-family: 'Unica', sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  font-style: normal;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #000;
+  transition: font-style 0.15s;
+}
+.tag:hover { font-style: italic; }
+.tag.active { font-style: italic; }
+
+/* project rows */
+.proj-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 25px;
+  border-bottom: 1px solid #000;
+  cursor: pointer;
+}
+.proj-row:first-child { border-top: 1px solid #000; }
+.proj-row:hover { background: #f5f5f5; }
+.proj-row.active { background: #000; color: #fff; }
+
+.proj-name { font-family: 'Unica', sans-serif; font-size: 24px; font-weight: normal; }
+.proj-year { font-family: 'Unica', sans-serif; font-size: 24px; }
+.proj-row.active .proj-year { color: #fff; }
+
+/* ── COL-2 ── */
+
+/* top bar inside col-2 */
+#case-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 25px 25px 0 25px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 5;
+}
+
+#case-title {
+  font-family: 'Unica', sans-serif;
+  font-size: 40px;
+  font-weight: normal;
+}
+
+#case-filters {
+  display: flex;
+  gap: 16px;
+}
+
+.case-filter {
+  font-family: 'Unica', sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  font-style: normal;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #000;
+  transition: font-style 0.15s;
+}
+.case-filter:hover { font-style: italic; }
+.case-filter.active { font-style: italic; }
+
+/* case content area */
+#case-content { padding: 0; }
+
+/* ── BLOCKS ── */
+
+/* every block has same bottom margin */
+.block { margin-bottom: 25px; }
+
+/* text block */
+.block-text {
+  border-top: 1px solid #000;
+}
+
+.block-text .block-title {
+  font-family: 'Unica', sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  padding: 12px 25px;
+  border-bottom: 1px solid #000;
+}
+
+.block-text .block-body {
+  font-family: 'Minion', serif;
+  font-size: 24px;
+  line-height: 1.6;
+  padding: 12px 25px;
+}
+
+.block-text .block-body p { margin-bottom: 12px; }
+.block-text .block-body p:last-child { margin-bottom: 0; }
+
+/* image block */
+.block-images {
+  display: flex;
+  gap: 8px;
+}
+
+/* 1 image = full width, 2 images = half width each */
+.block-images .img-wrap {
+  flex: 1;
+  height: 400px;
+  overflow: hidden;
+  background: #e8e8e8;
+}
+
+.block-images .img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* placeholder when no src */
+.block-images .img-wrap .img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Minion', serif;
+  font-size: 14px;
+  color: #999;
+}
+
+/* ── TEXT BLOCK ── */
+.text-block {
+  border-top: 1px solid #000;
+}
+
+.text-block .block-title {
+  font-family: 'Unica', sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  padding: 12px 25px;
+  border-bottom: 1px solid #000;
+}
+
+.text-block .block-body {
+  font-family: 'Minion', serif;
+  font-size: 24px;
+  line-height: 1.6;
+  padding: 12px 25px;
+}
+
+.text-block .block-body p { margin-bottom: 12px; }
+.text-block .block-body p:last-child { margin-bottom: 0; }
+
+/* ── IMAGE BLOCK ── */
+.image-block {
+  border-top: 1px solid #000;
+  display: flex;
+  gap: 0;
+}
+
+.image-block img {
+  flex: 1;
+  height: 400px;
+  width: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-block img:only-child {
+  width: 100%;
+}
+
+/* hidden state for filtering */
+.text-block.hidden { display: none; }
+.image-block.hidden { display: none; }
+
+/* about / empty state */
+#case-empty {
+  padding: 25px;
+  font-family: 'Unica', sans-serif;
+  font-size: 40px;
+  font-weight: normal;
+}
+
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <!-- COL-1: project list -->
+  <div class="col" id="col-1">
+    <div id="col-1-inner">
+      <div id="col-1-header">
+        <div id="site-title" onclick="reset()">Martin Wöllenstein</div>
+        <div id="filters">
+          <button class="tag active" data-tag="all">All</button>
+          <button class="tag" data-tag="Talk">Talk</button>
+          <button class="tag" data-tag="Research">Research</button>
+          <button class="tag" data-tag="Artwork">Artwork</button>
+          <button class="tag" data-tag="Curating">Curating</button>
+          <button class="tag" data-tag="Exhibition">Exhibition</button>
+          <button class="tag" data-tag="Workshop">Workshop</button>
+          <button class="tag" data-tag="Publication">Publication</button>
+          <button class="tag" data-tag="Text">Text</button>
+        </div>
+      </div>
+      <div id="projects-list"></div>
+    </div>
+  </div>
+
+  <!-- HANDLE -->
+  <div class="handle" id="handle-1"></div>
+
+  <!-- COL-2: case view -->
+  <div class="col" id="col-2">
+
+    <!-- shown when no project selected -->
+    <div id="case-empty">
+      <button onclick="openAbout()" style="font-family:'Unica',sans-serif;font-size:40px;font-weight:normal;background:none;border:none;cursor:pointer;padding:0;position:absolute;top:25px;right:25px;">About</button>
+    </div>
+
+    <!-- shown when project is open -->
+    <div id="case-view" style="display:none;">
+
+      <div id="case-topbar">
+        <div id="case-title"></div>
+        <div id="case-filters">
+          <button class="case-filter active" data-filter="all"   onclick="filterCase('all')">All</button>
+          <button class="case-filter"        data-filter="text"  onclick="filterCase('text')">Text</button>
+          <button class="case-filter"        data-filter="images" onclick="filterCase('images')">Images</button>
+        </div>
+      </div>
+
+      <div id="case-content">
+
+        <!-- TEXT BLOCK — copy and paste as many as you need -->
+        <div class="text-block" data-type="text">
+          <div class="block-title">Intro</div>
+          <div class="block-body">Designed Environment by MA Scenography during Art Basel. CIVIC, Basel Academy of Art and Design FHNW, Basel, 2024.</div>
+        </div>
+
+        <!-- IMAGE BLOCK — 1 image -->
+        <div class="image-block" data-type="images">
+          <img src="images/IMG_8707.jpeg" loading="lazy" alt="Yellow High">
+        </div>
+
+        <!-- IMAGE BLOCK — 2 images side by side -->
+        <div class="image-block" data-type="images">
+          <img src="images/IMG_8708.jpeg" loading="lazy" alt="Yellow High">
+          <img src="images/IMG_8709.jpeg" loading="lazy" alt="Yellow High">
+        </div>
+
+        <!-- TEXT BLOCK -->
+        <div class="text-block" data-type="text">
+          <div class="block-title">About</div>
+          <div class="block-body">Yellow High is a spatial intervention at CIVIC by the MA Scenography Class. Yell, low high repurposes a hot air balloon's massive fabric to construct a sculptural space that hosts an olfactory and sonic experience in its inside.</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+/* ── PROJECT DATA ── */
+const projects = [
+  {
+    id: 1,
+    name: "Yellow High",
+    year: "2024",
+    tag: "Exhibition",
+    /* blocks: array of content blocks in order.
+       type "text" = { type:"text", title:"...", body:"..." }
+       type "images" = { type:"images", srcs:["path1","path2"] }  — 1 or 2 srcs
+    */
+        blocks: [
+        {
+            type: "text",
+            title: "Intro",
+            body: "Designed Environment by MA Scenography during Art Basel. CIVIC, Basel Academy of Art and Design FHNW, Basel, 2024."
+        },
+        {
+            type: "images",
+            srcs: ["./images/balloon.jpeg", "./images/IMG_8707.jpeg"]
+        },
+        {
+            type: "text",
+            title: "About",
+            body: "Yellow High is a spatial intervention at CIVIC by the MA Scenography Class. Yell, low high repurposes a hot air balloon's massive fabric to construct a sculptural space that hosts an olfactory and sonic experience in its inside.\n\nDuring several days we invited musicians and dancers to play the space and to explore its aesthetic and material potentials."
+        },
+        {
+            type: "images",
+            srcs: ["./images/IMG_8708.jpeg"]
+        },
+        {
+            type: "text",
+            title: "Statement",
+            body: "As future spatial designers we are learning to configure spaces to host experiences. Our practice confronts us with questions about what these spaces should look, feel and act like.\n\nWe were aiming to create a space that is accommodating, hospitable and reveals itself intuitively based on embodied exploration and without further explanation."
+        },
+        {
+            type: "images",
+            srcs: ["./images/IMG_8796.jpeg", "./images/IMG_8978.jpeg"]
+        },
+        {
+            type: "text",
+            title: "Curatorial Statement",
+            body: "The dream of flying is as old as humanity. Hot air balloons were the first objects to make humans fly over longer distances.\n\nThere is something strange and poetic about turning a balloon into an exhibition space. Formerly filled with hot air and flying in the sky this yellow giant now provides space for bodies to explore its inside on the ground."
+        },
+        {
+            type: "images",
+            srcs: ["./images/show_DSF1102.jpg", "./images/show_DSF1134.jpg"]
+        }
+        ]
+  }
+  /* add more projects here in same format */
+];
+
+/* ── RENDER PROJECT LIST ── */
+document.getElementById("projects-list").innerHTML = projects.map(p =>
+  `<div class="proj-row" id="proj-${p.id}" onclick="openProject(${p.id})">
+    <span class="proj-name">${p.name}</span>
+    <span class="proj-year">${p.year}</span>
+  </div>`
+).join("");
+
+/* ── LEFT FILTERS ── */
+document.getElementById("filters").addEventListener("click", e => {
+  const btn = e.target.closest(".tag");
+  if (!btn) return;
+  if (btn.dataset.tag === "all") {
+    document.querySelectorAll(".tag").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+  } else {
+    document.querySelector('.tag[data-tag="all"]').classList.remove("active");
+    btn.classList.toggle("active");
+    if (!document.querySelector(".tag.active")) {
+      document.querySelector('.tag[data-tag="all"]').classList.add("active");
+    }
+  }
+});
+
+/* ── OPEN PROJECT ── */
+function openProject(id) {
+  const p = projects.find(x => x.id === id);
+
+  // highlight row
+  document.querySelectorAll(".proj-row").forEach(r => r.classList.remove("active"));
+  document.getElementById("proj-" + id).classList.add("active");
+
+  // set title
+  document.getElementById("case-title").textContent = p.name;
+
+  // render blocks
+  document.getElementById("case-content").innerHTML = p.blocks.map(block => {
+    if (block.type === "text") {
+      return `<div class="block block-text" data-type="text">
+        <div class="block-title">${block.title}</div>
+        <div class="block-body">${block.body.split(/\n\n+/).map(para => `<p>${para.replace(/\n/g,"<br>")}</p>`).join("")}</div>
+      </div>`;
+    } else if (block.type === "images") {
+      const imgs = block.srcs.map(src =>
+        `<div class="img-wrap">
+          <img src="${src}" alt="" onerror="this.parentNode.innerHTML='<div class=img-placeholder>${src.split('/').pop()}</div>'">
+        </div>`
+      ).join("");
+      return `<div class="block block-images" data-type="images">${imgs}</div>`;
+    }
+    return "";
+  }).join("");
+
+  // reset case filter to All
+  filterCase("all");
+
+  // show case view
+  document.getElementById("case-empty").style.display = "none";
+  document.getElementById("case-view").style.display = "block";
+
+  document.getElementById("col-2").scrollTop = 0;
+}
+
+/* ── CASE FILTER (top right) ── */
+function filterCase(type) {
+  document.querySelectorAll(".case-filter").forEach(b => {
+    b.classList.toggle("active", b.dataset.filter === type);
+  });
+  document.querySelectorAll("#case-content .text-block, #case-content .image-block").forEach(block => {
+    if (type === "all") {
+      block.classList.remove("hidden");
+    } else {
+      block.classList.toggle("hidden", block.dataset.type !== type);
+    }
+  });
+}
+
+/* ── ABOUT ── */
+function openAbout() {
+  document.querySelectorAll(".proj-row").forEach(r => r.classList.remove("active"));
+  document.getElementById("case-view").style.display = "none";
+  document.getElementById("case-empty").innerHTML = `
+    <div style="padding:25px;">
+      <div style="font-family:'Unica',sans-serif;font-size:40px;font-weight:normal;margin-bottom:16px;">About</div>
+      <div style="font-family:'Minion',serif;font-size:24px;line-height:1.6;">
+        <p style="margin-bottom:16px;">Martin Wöllenstein is a transdisciplinary artist and researcher. His work investigates global infrastructures, histories, and politics to trace how material and symbolic violence is encoded into systems.</p>
+        <p style="margin-bottom:16px;">Martin studied Fine Arts, Scenography, and Transversal Design in Halle, Havana, and Basel. He co-founded the artist platforms Nnoboa Space in Ghana (2023) and VIVA Comunidad Creativa in Cuba (2017).</p>
+        <p>He lives between Basel and Accra.</p>
+      </div>
+    </div>`;
+  document.getElementById("case-empty").style.display = "block";
+}
+
+/* ── RESET ── */
+function reset() {
+  document.querySelectorAll(".proj-row").forEach(r => r.classList.remove("active"));
+  document.getElementById("case-view").style.display = "none";
+  document.getElementById("case-empty").style.display = "block";
+  document.getElementById("case-empty").innerHTML = `
+    <button onclick="openAbout()" style="font-family:'Unica',sans-serif;font-size:40px;font-weight:normal;background:none;border:none;cursor:pointer;padding:0;position:absolute;top:25px;right:25px;">About</button>`;
+  document.getElementById("col-2").scrollTop = 0;
+}
+
+/* ── RESIZE ── */
+(function() {
+  const handle = document.getElementById("handle-1");
+  const left   = document.getElementById("col-1");
+  const right  = document.getElementById("col-2");
+  let drag=false, startX=0, startL=0, startR=0;
+
+  handle.addEventListener("mousedown", e => {
+    drag=true; startX=e.clientX; startL=left.offsetWidth; startR=right.offsetWidth;
+    handle.style.background = "rgba(0,0,0,0.08)";
+    document.body.style.cursor="col-resize";
+    document.body.style.userSelect="none";
+    e.preventDefault();
+  });
+  document.addEventListener("mousemove", e => {
+    if (!drag) return;
+    left.style.width  = Math.max(80, startL + e.clientX - startX) + "px";
+    right.style.width = Math.max(80, startR - e.clientX + startX) + "px";
+    left.style.transition = right.style.transition = "none";
+  });
+  document.addEventListener("mouseup", () => {
+    if (!drag) return;
+    drag=false;
+    handle.style.background = "";
+    document.body.style.cursor = document.body.style.userSelect = "";
+    left.style.transition = right.style.transition = "";
+  });
+})();
+
+</script>
+</body>
+</html>

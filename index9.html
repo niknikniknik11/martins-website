@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Wöllenstein</title>
+    <style>
+        @font-face {
+            font-family: 'Source';
+            src: url('.SourceSerifVariable.otf') format('opentype');
+            font-style: normal;
+            font-weight: 200;
+        }
+
+        :root {
+            --font-ui: 'Unica', sans-serif;
+            --font-body: 'Source', serif;
+            --fv-ui: 'wght' 200;
+            --size-ui: 24px;
+            --size-label: 16px;
+            --size-body: 24px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            color: #000;
+            background: #fff;
+        }
+
+        /* ── TOPBAR ── */
+        #topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 25px;
+            border-bottom: 1px solid #000;
+            flex-shrink: 0;
+        }
+
+        #topbar-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            cursor: pointer;
+        }
+
+        #topbar-title:hover {
+            opacity: 0.5;
+        }
+
+        #topbar-about {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        #topbar-about:hover {
+            opacity: 0.5;
+        }
+
+        /* ── LAYOUT ── */
+        #shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #cols-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .col {
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.25s ease;
+        }
+
+        #col-1 {
+            width: 33%;
+            border-right: 1px solid #000;
+        }
+
+        #col-2 {
+            width: 67%;
+        }
+
+        /* resize handle */
+        .handle {
+            width: 10px;
+            flex-shrink: 0;
+            cursor: col-resize;
+            background: transparent;
+            display: block;
+            z-index: 10;
+        }
+
+        /* ── COL-1 ── */
+        #col-1-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #col-1-header {
+            padding: 25px 25px 15px 25px;
+        }
+
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            row-gap: 5px;
+
+        }
+
+        .tag {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            font-style: normal;
+            background: none;
+            border: 1px solid #000;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 4px 14px;
+            color: #000;
+            transition: background 0.1s, color 0.1s;
+
+        }
+
+        .tag:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .tag.active {
+            background: #000;
+            color: #fff;
+        }
+
+        /* project rows */
+        .proj-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 25px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .proj-row::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25px;
+            right: 25px;
+            height: 1px;
+            background: #000;
+        }
+
+        .proj-row:first-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25px;
+            right: 25px;
+            height: 1px;
+            background: #000;
+        }
+
+        .proj-row:hover {
+            background: #ffffff;
+        }
+
+        .proj-row.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .proj-name {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+        }
+
+        .proj-year {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+        }
+
+        .proj-row.active .proj-year {
+            color: #000000;
+        }
+
+        /* ── COL-2 ── */
+        #case-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 25px 25px 15px 25px;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 5;
+        }
+
+        #case-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+        }
+
+        #case-filters {
+            display: flex;
+            row-gap: 5px;
+            position: center;
+        }
+
+        .case-filter {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            font-style: normal;
+            background: #000;
+            border: 1px solid #000;
+            cursor: pointer;
+            padding: 4px 14px;
+            color: #fff;
+            transition: background 0.1s, color 0.1s;
+            border-radius: 10px;
+        }
+
+        .case-filter:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .case-filter.inactive {
+            background: none;
+            color: #000;
+        }
+
+        .case-filter.inactive:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        /* ── BLOCKS ── */
+        .block-text {
+            margin-bottom: -1px;
+        }
+
+        .block-title {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            padding: 12px 25px 6px 25px;
+            position: relative;
+        }
+
+        .block-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25px;
+            right: 25px;
+            height: 1px;
+            background: #000;
+        }
+
+        .block-text .block-body {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            line-height: 1.3;
+            padding: 0px 25px 25px 25px;
+        }
+
+        .block-text .block-body p {
+            margin-bottom: 12px;
+        }
+
+        .block-text .block-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .block-images {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 12px 25px;
+            margin-bottom: -1px;
+        }
+
+        .block-images .img-wrap {
+            height: 400px;
+            overflow: hidden;
+            background: #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .block-images .img-wrap img {
+            height: 100%;
+            width: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .block-images .img-wrap .img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            color: #999;
+        }
+
+        .block.hidden {
+            display: none;
+        }
+
+        #case-empty {
+            padding: 25px;
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+        }
+
+        .about-heading {
+            font-family: var(--font-ui);
+            font-size: var(--size-ui);
+            font-variation-settings: var(--fv-ui);
+            margin-bottom: 16px;
+        }
+
+        .about-body {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            line-height: 1.6;
+        }
+
+        .about-body p {
+            margin-bottom: 16px;
+        }
+
+        .about-body p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="shell">
+
+        <!-- TOPBAR — always visible -->
+        <div id="topbar">
+            <div id="topbar-title" onclick="reset()">Martin Wöllenstein</div>
+            <button id="topbar-about" onclick="openAbout()">About</button>
+        </div>
+
+        <div id="cols-wrapper">
+
+            <!-- COL-1 -->
+            <div class="col" id="col-1">
+                <div id="col-1-inner">
+                    <div id="col-1-header">
+                        <div id="filters">
+                            <button class="tag" data-tag="Talk">Talk</button>
+                            <button class="tag" data-tag="Research">Research</button>
+                            <button class="tag" data-tag="Artwork">Artwork</button>
+                            <button class="tag" data-tag="Curating">Curating</button>
+                            <button class="tag" data-tag="Exhibition">Exhibition</button>
+                            <button class="tag" data-tag="Workshop">Workshop</button>
+                            <button class="tag" data-tag="Publication">Publication</button>
+                            <button class="tag" data-tag="Text">Text</button>
+                        </div>
+                    </div>
+                    <div id="projects-list"></div>
+                </div>
+            </div>
+
+            <!-- HANDLE -->
+            <div class="handle" id="handle-1"></div>
+
+            <!-- COL-2 -->
+            <div class="col" id="col-2">
+
+                <div id="case-empty"></div>
+
+                <div id="case-topbar" style="display:none;">
+                    <div id="case-title"></div>
+                    <div id="case-filters">
+                        <button class="case-filter" data-filter="text" onclick="toggleFilter('text')">Text</button>
+                        <button class="case-filter" data-filter="images"
+                            onclick="toggleFilter('images')">Images</button>
+                    </div>
+                </div>
+
+                <div id="projects-content">
+
+                    <section class="project" data-name="Yellow High" data-year="2024" data-tag="Exhibition">
+                        <div class="block block-text" data-type="text">
+                            <div class="block-title">Intro</div>
+                            <div class="block-body">
+                                Designed Environment by MA Scenography during Art Basel CIVIC, Basel Academy of Art and
+                                Design FHNW<br>
+                                Basel<br>
+                                2024
+                            </div>
+                        </div>
+
+                        <div class="block-title">Discription of images</div>
+                        <div class="block block-images" data-type="images">
+                            <div class="img-wrap"><img src="./images/IMG_8708.jpeg" alt=""></div>
+                            <div class="img-wrap"><img src="./images/IMG_8707.jpeg" alt=""></div>
+                            <div class="img-wrap"><img src="./images/IMG_8709.jpeg" alt=""></div>
+                        </div>
+                    </section>
+
+                    <section class="project" data-name="In-between worlds" data-year="2024" data-tag="Exhibition">
+                        <div class="block block-text" data-type="text">
+                            <div class="block-title">Intro</div>
+                            <div class="block-body">
+                                Site-Specific Performance Mohnheimer Kulturwerke (commission)<br>
+                                Mohnheim (Rhein)<br>
+                                2024
+                            </div>
+                        </div>
+
+                        <div class="block block-text" data-type="text">
+                            <div class="block-title">Role</div>
+                            <div class="block-body">
+                                Research<br>
+                                Performance<br>
+                                Concept<br>
+                                Scenography
+                            </div>
+                        </div>
+
+                        <div class="block block-text" data-type="text">
+                            <div class="block-title">Dancers</div>
+                            <div class="block-body">
+                                Erica d'Amico<br>
+                                Cristian Cucco<br>
+                                Hikaru Osakabe<br>
+                                Chiara Viscido
+                            </div>
+                        </div>
+
+                        <div class="block block-text" data-type="text">
+                            <div class="block-title">Description</div>
+                            <div class="block-body">
+                                <p>In-between worlds is a comisioned artistic intervention at the construction site of
+                                    Kulturraffinerie K714. Right next to the Rhine a former shell refinery is being
+                                    transformed into a state-of-the-art concert hall. This transition is accompanied by
+                                    a process of cultural mediation which looks into the collective memory, the present
+                                    social and political climate and the future imagination around the place and local
+                                    community. The project was preceded by an in-depth archival and participatory
+                                    research which involved voices and imagery from diverse stakeholders. In the form of
+                                    a Gesamtkunstwerk the piece combined classical music, dance, installation, video and
+                                    electronic sound art and walked visitors through different stages of the
+                                    construction site by staging four movements of transition.</p>
+                            </div>
+                        </div>
+
+                        <div class="block block-images" data-type="images">
+                            <div class="img-wrap"><img src="./images/before after2.jpg" alt=""></div>
+                        </div>
+                    </section>
+
+                </div><!-- #projects-content -->
+
+            </div><!-- #col-2 -->
+        </div><!-- #cols-wrapper -->
+    </div><!-- #shell -->
+
+    <script>
+        const sections = Array.from(document.querySelectorAll('.project'));
+        sections.forEach(s => s.style.display = 'none');
+
+        document.getElementById('projects-list').innerHTML = sections.map((s, i) =>
+            `<div class="proj-row" data-index="${i}" onclick="openProject(${i})">
+        <span class="proj-name">${s.dataset.name}</span>
+        <span class="proj-year">${s.dataset.year}</span>
+      </div>`
+        ).join('');
+
+        let activeTag = 'all';
+
+        document.getElementById('filters').addEventListener('click', e => {
+            const btn = e.target.closest('.tag');
+            if (!btn) return;
+            btn.classList.toggle('active');
+            updateSidebar();
+        });
+
+        function updateSidebar() {
+            const activeTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.dataset.tag);
+            document.querySelectorAll('.proj-row').forEach(row => {
+                const sec = sections[+row.dataset.index];
+                row.style.display = (activeTags.length === 0 || activeTags.includes(sec.dataset.tag)) ? '' : 'none';
+            });
+        }
+
+        let activeIndex = null;
+
+        function openProject(i) {
+            activeIndex = i;
+            document.querySelectorAll('.proj-row').forEach(r => r.classList.toggle('active', +r.dataset.index === i));
+            document.getElementById('case-title').textContent = sections[i].dataset.name;
+            sections.forEach(s => s.style.display = 'none');
+            sections[i].style.display = 'block';
+            document.getElementById('case-topbar').style.display = '';
+            document.getElementById('case-empty').style.display = 'none';
+            initFilters();
+            document.getElementById('col-2').scrollTop = 0;
+        }
+
+        // all filters start active (nothing hidden)
+        function initFilters() {
+            document.querySelectorAll('.case-filter').forEach(b => {
+                b.classList.remove('inactive');
+            });
+            if (activeIndex === null) return;
+            sections[activeIndex].querySelectorAll('.block').forEach(b => b.classList.remove('hidden'));
+        }
+
+        function toggleFilter(type) {
+            const btn = document.querySelector(`.case-filter[data-filter="${type}"]`);
+            btn.classList.toggle('inactive');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            if (activeIndex === null) return;
+            const hiddenTypes = Array.from(document.querySelectorAll('.case-filter.inactive')).map(b => b.dataset.filter);
+            sections[activeIndex].querySelectorAll('.block').forEach(block => {
+                block.classList.toggle('hidden', hiddenTypes.includes(block.dataset.type));
+            });
+        }
+
+        function openAbout() {
+            activeIndex = null;
+            document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+            sections.forEach(s => s.style.display = 'none');
+            document.getElementById('case-topbar').style.display = 'none';
+            document.getElementById('case-empty').innerHTML = `
+        <div style="padding:25px;">
+          <div class="about-heading">About</div>
+          <div class="about-body">
+            <p>Martin Wöllenstein is a transdisciplinary artist and researcher. His work investigates global infrastructures, histories, and politics to trace how material and symbolic violence is encoded into systems.</p>
+            <p>Martin studied Fine Arts, Scenography, and Transversal Design in Halle, Havana, and Basel. He co-founded the artist platforms Nnoboa Space in Ghana (2023) and VIVA Comunidad Creativa in Cuba (2017).</p>
+            <p>He lives between Basel and Accra.</p>
+          </div>
+        </div>`;
+            document.getElementById('case-empty').style.display = 'block';
+        }
+
+        function reset() {
+            activeIndex = null;
+            document.querySelectorAll('.proj-row').forEach(r => r.classList.remove('active'));
+            sections.forEach(s => s.style.display = 'none');
+            document.getElementById('case-topbar').style.display = 'none';
+            document.getElementById('case-empty').innerHTML = '';
+            document.getElementById('case-empty').style.display = 'block';
+            document.getElementById('col-2').scrollTop = 0;
+        }
+
+        (function () {
+            const handle = document.getElementById('handle-1');
+            const left = document.getElementById('col-1');
+            const right = document.getElementById('col-2');
+            let drag = false, startX = 0, startL = 0, startR = 0;
+            handle.addEventListener('mousedown', e => {
+                drag = true; startX = e.clientX; startL = left.offsetWidth; startR = right.offsetWidth;
+                handle.style.background = 'rgba(0,0,0,0.08)';
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', e => {
+                if (!drag) return;
+                left.style.width = Math.max(80, startL + e.clientX - startX) + 'px';
+                right.style.width = Math.max(80, startR - e.clientX + startX) + 'px';
+                left.style.transition = right.style.transition = 'none';
+            });
+            document.addEventListener('mouseup', () => {
+                if (!drag) return; drag = false;
+                handle.style.background = '';
+                document.body.style.cursor = document.body.style.userSelect = '';
+                left.style.transition = right.style.transition = '';
+            });
+        })();
+    </script>
+</body>
+
+</html>
