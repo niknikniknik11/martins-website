@@ -51,12 +51,6 @@
             padding: 0;
         }
 
-        button {
-            -webkit-appearance: none;
-            appearance: none;
-            color: inherit;
-        }
-
         html,
         body {
             height: 100%;
@@ -81,7 +75,6 @@
             flex-shrink: 0;
             transition: width 0.35s ease;
             background: #fff;
-            height: 100dvh;
         }
 
         /* starting state: col-1 full width, col-2 hidden */
@@ -181,18 +174,18 @@
         /* ── COL-1 ── */
         #col-1-inner {
             height: 100%;
-            overflow-y: auto;
+            /* overflow-y: auto; */
+            display: flex;
+            flex-direction: column;
         }
+
+
 
         #col-1-header {
             display: flex;
             align-items: stretch;
             height: var(--bar-h);
             border-bottom: 1px solid #000;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: #fff;
         }
 
         #site-title {
@@ -568,7 +561,7 @@
         .proj-tag-block {
             width: 26px;
             flex-shrink: 0;
-            transition: width 0.1s ease, opacity 0.15s ease;
+            transition: width 0.1s ease;
         }
 
         .proj-row:hover .proj-tag-block {
@@ -975,10 +968,6 @@
             color: #fff;
         }
 
-        body.dark #col-1-header {
-            background: #000;
-        }
-
         body.dark * {
             border-color: #fff !important;
         }
@@ -1104,7 +1093,6 @@
                 flex-wrap: wrap;
                 height: auto;
                 border-bottom: none;
-                position: static;
             }
 
             #site-title {
@@ -1264,12 +1252,11 @@
 
             .proj-row.active .proj-name,
             .proj-row:hover .proj-name {
-                padding-left: 15px;
+                padding-left: 20px;
             }
 
-            .proj-row.active .proj-name::before,
-            .proj-row:hover .proj-name::before {
-                opacity: 0 !important;
+            .proj-row.active .proj-name::before {
+                opacity: 0;
             }
 
             .about-col-image img {
@@ -1349,7 +1336,7 @@
                     <button id="header-about" onclick="openAbout()">About</button>
                 </div>
                 <div id="projects-list"></div>
-                <div class="project-footer" style="margin-top:0; border-top:none">
+                <div class="project-footer" style="margin-top:auto; border-top:none">
                     <span>Updated 2026</span>
                     <span>Design by Nik</span>
                 </div>
@@ -1585,7 +1572,6 @@
                     document.querySelector(`.tag[data-tag="${first}"]`).classList.remove('active');
                 }
             }
-            resetTagBlockOpacity();
             updateSidebar();
         });
 
@@ -1799,26 +1785,6 @@
                 left.style.transition = right.style.transition = '';
             });
         })();
-
-        function resetTagBlockOpacity() {
-            document.querySelectorAll('.proj-tag-block').forEach(block => {
-                block.style.opacity = '';
-            });
-        }
-
-        document.querySelectorAll('.tag').forEach(tag => {
-            tag.addEventListener('mouseenter', () => {
-                if (tag.classList.contains('active')) return;
-                const t = tag.dataset.tag;
-                document.querySelectorAll('.proj-tag-block').forEach(block => {
-                    const bt = block.dataset.tag;
-                    block.style.opacity = (bt === t || activeTags.has(bt)) ? '1' : '0';
-                });
-            });
-            tag.addEventListener('mouseleave', () => {
-                resetTagBlockOpacity();
-            });
-        });
 
         init();
     </script>
