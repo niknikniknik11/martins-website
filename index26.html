@@ -21,8 +21,8 @@
         :root {
             --font-ui: 'Unica', sans-serif;
             --font-body: 'Source', serif;
-            --fv-ui: 'wght' 90;
-            --fv-ui_active: 'wght' 110;
+            --fv-ui: 'wght' 80;
+            --fv-ui_active: 'wght' 100;
             --fv-body: 'wght' 500;
 
             --size-ui: 24px;
@@ -66,15 +66,6 @@
             font-variation-settings: var(--fv-ui);
             color: #000;
             background: #fff;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        @supports (-webkit-hyphens: none) {
-            :root {
-                --fv-ui: 'wght' 100;
-                --fv-body: 'wght' 420;
-            }
         }
 
         /* ── LAYOUT ── */
@@ -160,6 +151,10 @@
 
 
 
+        .about-back-btn:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
 
         /* resize handle */
         .handle {
@@ -220,6 +215,10 @@
             transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
         }
 
+        #site-title:hover span {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
 
         #header-about {
             font-family: var(--font-ui);
@@ -238,6 +237,10 @@
             transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
         }
 
+        #header-about:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
 
         #filters {
             flex: 1;
@@ -284,6 +287,49 @@
         } */
 
 
+        .tag[data-tag="Talk"]:hover {
+            background: var(--c-talk);
+            color: #fff;
+        }
+
+        .tag[data-tag="Research"]:hover {
+            background: var(--c-research);
+            color: #fff;
+        }
+
+        .tag[data-tag="Artwork"]:hover {
+            background: var(--c-artwork);
+            color: #fff;
+        }
+
+        .tag[data-tag="Curating"]:hover {
+            background: var(--c-curating);
+            color: #fff;
+        }
+
+        .tag[data-tag="Exhibition"]:hover {
+            background: var(--c-exhibition);
+            color: #fff;
+        }
+
+        .tag[data-tag="Workshop"]:hover {
+            background: var(--c-workshop);
+            color: #fff;
+        }
+
+        .tag[data-tag="Publication"]:hover {
+            background: var(--c-publication);
+            color: #fff;
+        }
+
+        .tag[data-tag="Text"]:hover {
+            background: var(--c-text);
+            color: #fff;
+        }
+
+        .tag:hover .tag-full {
+            font-variation-settings: var(--fv-ui_active);
+        }
 
 
 
@@ -382,19 +428,6 @@
             position: relative;
         }
 
-        .proj-row {
-            transition: height 0.2s ease, opacity 0.18s ease;
-        }
-
-        .proj-row.filtered {
-            height: 0 !important;
-            min-height: 0 !important;
-            opacity: 0;
-            pointer-events: none;
-            overflow: hidden;
-            border-bottom: none;
-        }
-
         .proj-row.active {
             background: #000;
             color: #fff;
@@ -412,9 +445,30 @@
             transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
         }
 
+        .proj-row:hover .proj-name,
+        .proj-row:hover .proj-location,
+        .proj-row:hover .proj-year {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
+
         .proj-location,
         .proj-year {
             transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .proj-row:hover .proj-location,
+        .proj-row:hover .proj-year {
+            transform: translateX(25px);
+        }
+
+        .proj-row.active:hover {
+            background: #000;
+        }
+
+        .proj-row.active:hover .proj-location,
+        .proj-row.active:hover .proj-year {
+            transform: none;
         }
 
 
@@ -439,6 +493,13 @@
             transition: opacity 0.1s ease;
         }
 
+        .proj-row:hover .proj-name {
+            padding-left: 49px;
+        }
+
+        .proj-row:hover .proj-name::before {
+            opacity: 1;
+        }
 
         .proj-row.active .proj-name {
             padding-left: 49px;
@@ -509,6 +570,13 @@
             transition: width 0.1s ease, opacity 0.15s ease;
         }
 
+        .proj-row:hover .proj-tag-block {
+            width: 13px;
+        }
+
+        .proj-row.active:hover .proj-tag-block {
+            width: 26px;
+        }
 
         .proj-row.active .proj-tag-block {
             opacity: 0;
@@ -583,6 +651,11 @@
             white-space: nowrap;
         }
 
+        .case-filter:hover {
+            font-variation-settings: var(--fv-ui_active);
+            background: #000;
+            color: #fff;
+        }
 
         .case-filter.active {
             background: #000;
@@ -832,6 +905,13 @@
             transition: opacity 0.1s ease;
         }
 
+        .about-links a:hover {
+            padding-left: 18px;
+        }
+
+        .about-links a:hover::before {
+            opacity: 1;
+        }
 
         .about-cv-btn {
             font-family: var(--font-ui);
@@ -848,6 +928,10 @@
             transition: font-variation-settings 0.2s ease, letter-spacing 0.2s ease;
         }
 
+        .about-cv-btn:hover {
+            font-variation-settings: var(--fv-ui_active);
+            letter-spacing: -0.0075em;
+        }
 
         #about-header {
             display: flex;
@@ -875,6 +959,10 @@
             color: #000;
         }
 
+        #dark-mode-btn:hover {
+            background: #000000;
+            color: #ffffff;
+        }
 
 
 
@@ -908,12 +996,14 @@
             color: #fff;
         }
 
+        body.dark .case-filter:hover,
         body.dark .case-filter.active {
             background: #fff;
             color: #000;
         }
 
-        body.dark .proj-row.active {
+        body.dark .proj-row.active,
+        body.dark .proj-row.active:hover {
             background: #fff;
             color: #000;
         }
@@ -940,6 +1030,10 @@
             color: #fff;
         }
 
+        body.dark #dark-mode-btn:hover {
+            background: #fff;
+            color: #000;
+        }
 
 
         body.dark #case-back,
@@ -953,55 +1047,6 @@
         }
     
 
-
-        /* ── HOVER (pointer devices only) ── */
-        @media (hover: hover) {
-            .about-back-btn:hover,
-            #header-about:hover,
-            .about-cv-btn:hover {
-                font-variation-settings: var(--fv-ui_active);
-                letter-spacing: -0.0075em;
-            }
-            #site-title:hover span {
-                font-variation-settings: var(--fv-ui_active);
-                letter-spacing: -0.0075em;
-            }
-            .tag[data-tag="Talk"]:hover { background: var(--c-talk); color: #fff; }
-            .tag[data-tag="Research"]:hover { background: var(--c-research); color: #fff; }
-            .tag[data-tag="Artwork"]:hover { background: var(--c-artwork); color: #fff; }
-            .tag[data-tag="Curating"]:hover { background: var(--c-curating); color: #fff; }
-            .tag[data-tag="Exhibition"]:hover { background: var(--c-exhibition); color: #fff; }
-            .tag[data-tag="Workshop"]:hover { background: var(--c-workshop); color: #fff; }
-            .tag[data-tag="Publication"]:hover { background: var(--c-publication); color: #fff; }
-            .tag[data-tag="Text"]:hover { background: var(--c-text); color: #fff; }
-            .tag:hover .tag-full { font-variation-settings: var(--fv-ui_active); }
-            .proj-row:hover .proj-name,
-            .proj-row:hover .proj-location,
-            .proj-row:hover .proj-year {
-                font-variation-settings: var(--fv-ui_active);
-                letter-spacing: -0.0075em;
-            }
-            .proj-row:hover .proj-location,
-            .proj-row:hover .proj-year { transform: translateX(25px); }
-            .proj-row.active:hover { background: #000; }
-            .proj-row.active:hover .proj-location,
-            .proj-row.active:hover .proj-year { transform: none; }
-            .proj-row:hover .proj-name { padding-left: 49px; }
-            .proj-row:hover .proj-name::before { opacity: 1; }
-            .proj-row:hover .proj-tag-block { width: 13px; }
-            .proj-row.active:hover .proj-tag-block { width: 26px; }
-            .case-filter:hover {
-                font-variation-settings: var(--fv-ui_active);
-                background: #000;
-                color: #fff;
-            }
-            .about-links a:hover { padding-left: 18px; }
-            .about-links a:hover::before { opacity: 1; }
-            #dark-mode-btn:hover { background: #000; color: #fff; }
-            body.dark .case-filter:hover { background: #fff; color: #000; }
-            body.dark #dark-mode-btn:hover { background: #fff; color: #000; }
-            body.dark .proj-row.active:hover { background: #fff; color: #000; }
-        }
 
         /* ── MOBILE ── */
         @media (max-width: 768px) {
@@ -1029,6 +1074,7 @@
                 left: 15px;
             }
 
+            .proj-row:hover .proj-name,
             .proj-row.active .proj-name {
                 padding-left: 44px;
             }
@@ -1037,6 +1083,9 @@
                 width: 15px;
             }
 
+            .proj-row:hover .proj-tag-block {
+                width: 10px;
+            }
 
             #site-title {
                 padding: 0 15px;
@@ -1117,29 +1166,6 @@
             #col-1.open,
             #col-1.about {
                 width: 0;
-            }
-
-            /* Keep mobile layout during the open transition — override desktop narrow-panel styles */
-            #col-1.open .tag-full,
-            #col-1.open .tag-bold-ghost { display: revert; }
-            #col-1.open .tag-short { display: none; }
-            #col-1.open #filters .tag { flex: 0 0 25%; padding: 0 10px; }
-            #col-1.open #site-title { width: auto; flex-shrink: 1; padding: 0 15px; }
-            #col-1.open #filters {
-                flex: unset;
-                min-width: unset;
-                opacity: 1;
-                transform: none;
-                pointer-events: auto;
-            }
-            #col-1.open .proj-row { grid-template-columns: 50% 25% 15% 10%; }
-            #col-1.open .proj-tags { padding-right: 15px; }
-            #col-1.open .proj-location,
-            #col-1.open .proj-year {
-                opacity: 1;
-                transform: none;
-                pointer-events: auto;
-                overflow: visible;
             }
 
             #col-2.open {
@@ -1229,16 +1255,19 @@
                 padding: 0 15px 12px 15px;
             }
 
-            .proj-row.active {
+            .proj-row.active,
+            .proj-row.active:hover {
                 background: #fff;
                 color: #000;
             }
 
-            .proj-row.active .proj-name {
+            .proj-row.active .proj-name,
+            .proj-row:hover .proj-name {
                 padding-left: 15px;
             }
 
-            .proj-row.active .proj-name::before {
+            .proj-row.active .proj-name::before,
+            .proj-row:hover .proj-name::before {
                 opacity: 0 !important;
             }
 
@@ -1271,10 +1300,6 @@
 
             .project-footer{
                     padding: 0 15px;
-            }
-
-            .block-images{
-                    padding: 0px 15px 0px 15px
             }
 
 
@@ -1340,9 +1365,64 @@
                 <div id="about-content">
                     <div id="about-header">
                         <button class="about-back-btn" onclick="closeAbout()">Martin Wöllenstein</button>
-                        <a class="about-cv-btn" href="#" download>Download CV</a>
+                        <a class="about-cv-btn" href="./images/Artist_CV_Martin_Woellenstein_2026.pdf" download>Download
+                            CV</a>
                     </div>
-                    <div class="about-grid"></div>
+                    <div class="about-grid">
+                        <div class="about-row">
+                            <div class="about-col">
+                                <div class="block-title">Bio</div>
+                                <div class="about-body">
+                                    <p>Martin Wöllenstein (b. 1991, Germany) is a visual artist and researcher.</p>
+                                    <p>He studied Fine Arts at Burg Giebiechenstein University of Art and Design Halle,
+                                        Saale (Germany) and at Universidad de las Artes, Havana (Cuba) and Transversal
+                                        Design at the Academy of Art and Design, Basel (Switzerland).</p>
+                                    <p>Martin co-founded the artist collective VIVA Comunidad Creativa in Cuba (2017)
+                                        the
+                                        creative platform Nnoboa Space in Ghana (2023) and is a frequent collaborator of
+                                        the Berlin-based, zero-waste fashion label IMPARI.</p>
+                                </div>
+                            </div>
+                            <div class="about-col about-col-image">
+                                <div class="block-title">Image of Martin</div>
+                                <img src="./images/About_image.jpeg" alt="">
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <div class="about-col">
+                                <div class="block-title">Exhibitions</div>
+                                <div class="about-exhibitions">
+                                    <span>Berlin Fashion Week, 2026</span>
+                                    <span>CIVIC, Basel, 2025</span>
+                                    <span>Perve Galeria, Lisbon, 2025</span>
+                                    <span>Goethe Institute, Accra, 2025</span>
+                                    <span>Artco Gallery, Berlin, 2024</span>
+                                    <span>Villa Medici, Rome, 2024</span>
+                                    <span>Nubuke Foundation, Accra, 2023</span>
+                                    <span>Havana Biennial, 2015</span>
+                                </div>
+                            </div>
+                            <div class="about-col">
+                                <div class="block-title">Contact</div>
+                                <div class="about-links">
+                                    <a href="mailto:mail@martinwoellenstein.com">martin.woellenstein(at)gmail.com</a>
+                                    <a href="https://instagram.com/martinwoellenstein" target="_blank">Instagram</a>
+                                    <a href="https://martinwoellenstein.com" target="_blank">martinwoellenstein.com</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <div class="about-col">
+                                <div class="block-title">Projects</div>
+                                <div class="about-exhibitions">
+                                    <span>Upcoming</span>
+                                    <span>old</span>
+                                </div>
+                            </div>
+                            <div class="about-col"></div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -1384,7 +1464,6 @@
         let activeIndex = null;
         let previousIndex = null;
         const activeTags = new Set();
-        const rowGen = new Map();
 
         function toggleDark() {
             document.body.classList.toggle('dark');
@@ -1393,62 +1472,6 @@
         // SANITY
         function sanityImageUrl(ref) {
             return `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${ref.replace('image-', '').replace(/-(\w+)$/, '.$1')}`;
-        }
-
-        function sanityFileUrl(ref) {
-            return `https://cdn.sanity.io/files/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${ref.replace('file-', '').replace(/-(\w+)$/, '.$1')}`;
-        }
-
-        async function fetchAbout() {
-            const query = encodeURIComponent('*[_type == "about"][0]');
-            const url = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${SANITY_DATASET}?query=${query}`;
-            const res = await fetch(url, { headers: { Authorization: `Bearer ${SANITY_TOKEN}` } });
-            const data = await res.json();
-            return data.result;
-        }
-
-        function renderAboutCol(block) {
-            const title = block.title ? `<div class="block-title">${block.title}</div>` : '';
-
-            if (block._type === 'textBlock') {
-                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
-                return `<div class="about-col">${title}<div class="about-body">${paras}</div></div>`;
-            }
-
-            if (block._type === 'photoBlock') {
-                const ref = block.image?.asset?._ref || '';
-                const src = ref ? sanityImageUrl(ref) : '';
-                return `<div class="about-col about-col-image">${title}${src ? `<img src="${src}" alt="">` : ''}</div>`;
-            }
-
-            if (block._type === 'linksBlock') {
-                const links = (block.links || []).map(l => `<a href="${l.url}">${l.label}</a>`).join('');
-                return `<div class="about-col">${title}<div class="about-links">${links}</div></div>`;
-            }
-
-            return '<div class="about-col"></div>';
-        }
-
-        function populateAbout(about) {
-            if (!about) return;
-
-            if (about.cv?.asset?._ref) {
-                const cvBtn = document.querySelector('.about-cv-btn');
-                if (cvBtn) cvBtn.href = sanityFileUrl(about.cv.asset._ref);
-            }
-
-            const grid = document.querySelector('.about-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const blocks = about.blocks || [];
-            for (let i = 0; i < blocks.length; i += 2) {
-                const row = document.createElement('div');
-                row.className = 'about-row';
-                row.innerHTML = renderAboutCol(blocks[i]) +
-                    (blocks[i + 1] ? renderAboutCol(blocks[i + 1]) : '<div class="about-col"></div>');
-                grid.appendChild(row);
-            }
         }
 
         async function fetchProjects() {
@@ -1561,99 +1584,34 @@
                     document.querySelector(`.tag[data-tag="${first}"]`).classList.remove('active');
                 }
             }
+            resetTagBlockOpacity();
             updateSidebar();
         });
 
         function updateSidebar() {
-            const activeList = [...activeTags];
-            const getOrder = t => {
-                const ai = activeList.indexOf(t);
-                return ai === 0 ? 2 : ai === 1 ? 1 : 0;
-            };
-            const sortBlocks = blocks => blocks.sort((a, b) => {
-                const oa = getOrder(a.dataset.tag), ob = getOrder(b.dataset.tag);
-                if (oa !== ob) return oa - ob;
-                return TAG_ORDER.indexOf(a.dataset.tag) - TAG_ORDER.indexOf(b.dataset.tag);
-            });
-
             document.querySelectorAll('.proj-row').forEach(row => {
-                const gen = (rowGen.get(row) || 0) + 1;
-                rowGen.set(row, gen);
-
                 const sec = sections[+row.dataset.index];
                 const tags = JSON.parse(sec.dataset.tags || '[]');
-                const visible = activeTags.size === 0 || [...activeTags].every(t => tags.includes(t));
-                row.style.display = '';
-                row.classList.toggle('filtered', !visible);
+                row.style.display = (activeTags.size === 0 || [...activeTags].every(t => tags.includes(t))) ? '' : 'none';
 
                 const container = row.querySelector('.proj-tags');
                 const blocks = [...container.querySelectorAll('.proj-tag-block')];
-
-                if (!visible) {
-                    sortBlocks(blocks).forEach(b => { b.style.display = ''; b.style.marginRight = ''; container.appendChild(b); });
-                    return;
-                }
-
-                const activeBlocks = blocks.filter(b => activeTags.has(b.dataset.tag));
-                const nonActiveBlocks = blocks.filter(b => !activeTags.has(b.dataset.tag));
-                const oldX = new Map();
-                activeBlocks.forEach(b => oldX.set(b, b.getBoundingClientRect().left));
-
-                const needFade = nonActiveBlocks.some(b => b.style.opacity !== '0');
-                if (needFade) {
-                    nonActiveBlocks.forEach(b => { b.style.transition = 'opacity 0.07s'; b.style.opacity = '0'; });
-                }
-
-                setTimeout(() => {
-                    if (rowGen.get(row) !== gen) return;
-
-                    sortBlocks(blocks).forEach(b => { b.style.display = ''; b.style.marginRight = ''; container.appendChild(b); });
-
-                    if (activeBlocks.length === 0) {
-                        blocks.forEach(b => { b.style.opacity = ''; });
-                        return;
-                    }
-
-                    if (activeTags.size === 1) {
-                        const oldActiveX = oldX.get(activeBlocks[0]) ?? 0;
-                        const newActiveX = activeBlocks[0].getBoundingClientRect().left;
-                        const groupDx = oldActiveX - newActiveX;
-                        blocks.forEach(b => {
-                            b.style.transition = 'none';
-                            b.style.transform = `translateX(${groupDx}px)`;
-                            b.style.opacity = '1';
-                        });
-                        requestAnimationFrame(() => requestAnimationFrame(() => {
-                            if (rowGen.get(row) !== gen) return;
-                            blocks.forEach(b => { b.style.transition = 'transform 0.25s ease'; b.style.transform = ''; });
-                            setTimeout(() => {
-                                if (rowGen.get(row) !== gen) return;
-                                blocks.forEach(b => { b.style.transition = ''; b.style.transform = ''; b.style.opacity = ''; });
-                            }, 290);
-                        }));
-                    } else {
-                        // Ensure active blocks are visible — a previous stale fade may have set them to opacity 0
-                        activeBlocks.forEach(b => { b.style.transition = 'none'; b.style.opacity = ''; });
-                        // FLIP each active block
-                        activeBlocks.forEach(b => {
-                            const dx = (oldX.get(b) ?? 0) - b.getBoundingClientRect().left;
-                            if (Math.abs(dx) > 0.5) {
-                                b.style.transition = 'none';
-                                b.style.transform = `translateX(${dx}px)`;
-                                requestAnimationFrame(() => requestAnimationFrame(() => {
-                                    if (rowGen.get(row) !== gen) return;
-                                    b.style.transition = 'transform 0.2s ease';
-                                    b.style.transform = '';
-                                    setTimeout(() => {
-                                        if (rowGen.get(row) !== gen) return;
-                                        b.style.transition = '';
-                                    }, 240);
-                                }));
-                            }
-                        });
-                        blocks.filter(b => !activeTags.has(b.dataset.tag)).forEach(b => { b.style.opacity = ''; });
-                    }
-                }, needFade ? 80 : 10);
+                const activeList = [...activeTags];
+                const getOrder = t => {
+                    const ai = activeList.indexOf(t);
+                    if (ai === 0) return 2;
+                    if (ai === 1) return 1;
+                    return 0;
+                };
+                blocks.sort((a, b) => {
+                    const oa = getOrder(a.dataset.tag), ob = getOrder(b.dataset.tag);
+                    if (oa !== ob) return oa - ob;
+                    return TAG_ORDER.indexOf(a.dataset.tag) - TAG_ORDER.indexOf(b.dataset.tag);
+                }).forEach(b => {
+                    b.style.display = '';
+                    b.style.marginRight = '';
+                    container.appendChild(b);
+                });
             });
         }
 
@@ -1760,7 +1718,6 @@
             document.getElementById('case-topbar').style.display = 'none';
             document.getElementById('header-about').style.display = 'none';
             document.getElementById('case-empty').style.display = 'block';
-            fetchAbout().then(populateAbout);
         }
 
         function closeAbout() {
@@ -1848,21 +1805,19 @@
             });
         }
 
-        if (window.matchMedia('(hover: hover)').matches) {
-            document.querySelectorAll('.tag').forEach(tag => {
-                tag.addEventListener('mouseenter', () => {
-                    if (tag.classList.contains('active')) return;
-                    const t = tag.dataset.tag;
-                    document.querySelectorAll('.proj-tag-block').forEach(block => {
-                        const bt = block.dataset.tag;
-                        block.style.opacity = (bt === t || activeTags.has(bt)) ? '1' : '0';
-                    });
-                });
-                tag.addEventListener('mouseleave', () => {
-                    resetTagBlockOpacity();
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('mouseenter', () => {
+                if (tag.classList.contains('active')) return;
+                const t = tag.dataset.tag;
+                document.querySelectorAll('.proj-tag-block').forEach(block => {
+                    const bt = block.dataset.tag;
+                    block.style.opacity = (bt === t || activeTags.has(bt)) ? '1' : '0';
                 });
             });
-        }
+            tag.addEventListener('mouseleave', () => {
+                resetTagBlockOpacity();
+            });
+        });
 
         init();
     </script>
