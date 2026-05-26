@@ -33,14 +33,14 @@
             --ls-label: 0.05em;
             --size-body: 24px;
 
-            --c-talk: #c4b0f5;
-            --c-research: #f0b8d8;
-            --c-artwork: #7898f0;
-            --c-curating: #f0b070;
-            --c-exhibition: #f0e060;
-            --c-workshop: #80e0c0;
-            --c-publication: #e06860;
-            --c-text: #88ccf8;
+            --c-artwork: #e9fe53;
+            --c-exhibition: #f8e589;
+            --c-research: #e6803c;
+            --c-design: #db5626;
+            --c-curating: #ae501f;
+            --c-teaching: #673110;
+            --c-publication: #200e02;
+            --c-event: #0e1188;
         }
 
         *,
@@ -186,6 +186,7 @@
         #col-1-inner {
             height: 100%;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #col-1-header {
@@ -294,9 +295,14 @@
 
 
 
-        .tag[data-tag="Talk"].active {
-            background: var(--c-talk);
-            color: #fff;
+        .tag[data-tag="Artwork"].active {
+            background: var(--c-artwork);
+            color: #000;
+        }
+
+        .tag[data-tag="Exhibition"].active {
+            background: var(--c-exhibition);
+            color: #000;
         }
 
         .tag[data-tag="Research"].active {
@@ -304,8 +310,8 @@
             color: #fff;
         }
 
-        .tag[data-tag="Artwork"].active {
-            background: var(--c-artwork);
+        .tag[data-tag="Design"].active {
+            background: var(--c-design);
             color: #fff;
         }
 
@@ -314,14 +320,9 @@
             color: #fff;
         }
 
-        .tag[data-tag="Exhibition"].active {
-            background: var(--c-exhibition);
-            color: #ffffff;
-        }
-
-        .tag[data-tag="Workshop"].active {
-            background: var(--c-workshop);
-            color: #ffffff;
+        .tag[data-tag="Teaching"].active {
+            background: var(--c-teaching);
+            color: #fff;
         }
 
         .tag[data-tag="Publication"].active {
@@ -329,8 +330,8 @@
             color: #fff;
         }
 
-        .tag[data-tag="Text"].active {
-            background: var(--c-text);
+        .tag[data-tag="Event"].active {
+            background: var(--c-event);
             color: #fff;
         }
 
@@ -760,6 +761,18 @@
             margin-bottom: 0;
         }
 
+        .about-list {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            font-variation-settings: var(--fv-body);
+            line-height: 1.3;
+            padding: 0 25px 25px 25px;
+        }
+
+        .about-list p {
+            margin-bottom: 0;
+        }
+
         .about-grid {
             display: flex;
             flex-direction: column;
@@ -873,6 +886,7 @@
             justify-content: center;
             background: transparent;
             color: #000;
+            margin-right: 20px;
         }
 
 
@@ -966,14 +980,14 @@
                 font-variation-settings: var(--fv-ui_active);
                 letter-spacing: -0.0075em;
             }
-            .tag[data-tag="Talk"]:hover { background: var(--c-talk); color: #fff; }
+            .tag[data-tag="Artwork"]:hover { background: var(--c-artwork); color: #000; }
+            .tag[data-tag="Exhibition"]:hover { background: var(--c-exhibition); color: #000; }
             .tag[data-tag="Research"]:hover { background: var(--c-research); color: #fff; }
-            .tag[data-tag="Artwork"]:hover { background: var(--c-artwork); color: #fff; }
+            .tag[data-tag="Design"]:hover { background: var(--c-design); color: #fff; }
             .tag[data-tag="Curating"]:hover { background: var(--c-curating); color: #fff; }
-            .tag[data-tag="Exhibition"]:hover { background: var(--c-exhibition); color: #fff; }
-            .tag[data-tag="Workshop"]:hover { background: var(--c-workshop); color: #fff; }
+            .tag[data-tag="Teaching"]:hover { background: var(--c-teaching); color: #fff; }
             .tag[data-tag="Publication"]:hover { background: var(--c-publication); color: #fff; }
-            .tag[data-tag="Text"]:hover { background: var(--c-text); color: #fff; }
+            .tag[data-tag="Event"]:hover { background: var(--c-event); color: #fff; }
             .tag:hover .tag-full { font-variation-settings: var(--fv-ui_active); }
             .proj-row:hover .proj-name,
             .proj-row:hover .proj-location,
@@ -1280,6 +1294,11 @@
 
 
         }
+
+        .project-footer a {
+            color: inherit;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -1292,22 +1311,22 @@
                 <div id="col-1-header">
                     <div id="site-title" onclick="reset()"><span>Martin Wöllenstein</span></div>
                     <div id="filters">
-                        <button class="tag" data-tag="Talk"><span class="tag-full">Talk</span><span
-                                class="tag-bold-ghost">Talk</span><span class="tag-short">T</span></button>
-                        <button class="tag" data-tag="Research"><span class="tag-full">Research</span><span
-                                class="tag-bold-ghost">Research</span><span class="tag-short">R</span></button>
                         <button class="tag" data-tag="Artwork"><span class="tag-full">Artwork</span><span
                                 class="tag-bold-ghost">Artwork</span><span class="tag-short">A</span></button>
-                        <button class="tag" data-tag="Curating"><span class="tag-full">Curating</span><span
-                                class="tag-bold-ghost">Curating</span><span class="tag-short">C</span></button>
                         <button class="tag" data-tag="Exhibition"><span class="tag-full">Exhibition</span><span
                                 class="tag-bold-ghost">Exhibition</span><span class="tag-short">E</span></button>
-                        <button class="tag" data-tag="Workshop"><span class="tag-full">Workshop</span><span
-                                class="tag-bold-ghost">Workshop</span><span class="tag-short">W</span></button>
+                        <button class="tag" data-tag="Research"><span class="tag-full">Research</span><span
+                                class="tag-bold-ghost">Research</span><span class="tag-short">R</span></button>
+                        <button class="tag" data-tag="Design"><span class="tag-full">Design</span><span
+                                class="tag-bold-ghost">Design</span><span class="tag-short">D</span></button>
+                        <button class="tag" data-tag="Curating"><span class="tag-full">Curating</span><span
+                                class="tag-bold-ghost">Curating</span><span class="tag-short">C</span></button>
+                        <button class="tag" data-tag="Teaching"><span class="tag-full">Teaching</span><span
+                                class="tag-bold-ghost">Teaching</span><span class="tag-short">T</span></button>
                         <button class="tag" data-tag="Publication"><span class="tag-full">Publication</span><span
                                 class="tag-bold-ghost">Publication</span><span class="tag-short">P</span></button>
-                        <button class="tag" data-tag="Text"><span class="tag-full">Text</span><span
-                                class="tag-bold-ghost">Text</span><span class="tag-short">T</span></button>
+                        <button class="tag" data-tag="Event"><span class="tag-full">Event</span><span
+                                class="tag-bold-ghost">Event</span><span class="tag-short">V</span></button>
                     </div>
                     <button id="dark-mode-btn" onclick="toggleDark()"><svg width="22" height="22"
                             viewBox="0 0 227.3 227.3" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
@@ -1325,7 +1344,7 @@
                 <div id="projects-list"></div>
                 <div class="project-footer" style="margin-top:0; border-top:none">
                     <span>Updated 2026</span>
-                    <span>Design by Nik</span>
+                    <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en" target="_blank" rel="noopener">CC</a> BY-NC-ND Martin Wöllenstein</span>
                 </div>
             </div>
         </div>
@@ -1373,11 +1392,11 @@
         const SANITY_DATASET = 'production';
         const SANITY_TOKEN = 'skJgM39jVueFEVB1dFkXRgceCeFogPCuGtrXD9O69qrRhTdho5kHHHcOO0mX1hh1p5N1yDa6hklDWTMzWmefVheY2hfZzVE5X2U6gF4eIetu57fiQZ9yzAGmNpd7PqZuQZCG5xceIC6wqIEgmDnbYkVa3ZWWrb5PTDDZNzp1Y9Hf189YWwu2';
 
-        const TAG_ORDER = ['Talk', 'Research', 'Artwork', 'Curating', 'Exhibition', 'Workshop', 'Publication', 'Text'];
+        const TAG_ORDER = ['Artwork', 'Exhibition', 'Research', 'Design', 'Curating', 'Teaching', 'Publication', 'Event'];
         const tagColors = {
-            Talk: 'var(--c-talk)', Research: 'var(--c-research)', Artwork: 'var(--c-artwork)',
-            Curating: 'var(--c-curating)', Exhibition: 'var(--c-exhibition)', Workshop: 'var(--c-workshop)',
-            Publication: 'var(--c-publication)', Text: 'var(--c-text)'
+            Artwork: 'var(--c-artwork)', Exhibition: 'var(--c-exhibition)', Research: 'var(--c-research)',
+            Design: 'var(--c-design)', Curating: 'var(--c-curating)', Teaching: 'var(--c-teaching)',
+            Publication: 'var(--c-publication)', Event: 'var(--c-event)'
         };
 
         let sections = [];
@@ -1419,6 +1438,11 @@
                 const ref = block.image?.asset?._ref || '';
                 const src = ref ? sanityImageUrl(ref) : '';
                 return `<div class="about-col about-col-image">${title}${src ? `<img src="${src}" alt="">` : ''}</div>`;
+            }
+
+            if (block._type === 'listBlock') {
+                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                return `<div class="about-col">${title}<div class="about-list">${paras}</div></div>`;
             }
 
             if (block._type === 'linksBlock') {
@@ -1515,7 +1539,7 @@
                 s.insertAdjacentHTML('beforeend', `
                     <div class="project-spacer"></div>
                     <div class="project-footer">
-                        <span>Project ${num}</span>
+                        <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en" target="_blank" rel="noopener">CC</a> BY-NC-ND Martin Wöllenstein</span>
                         <span>${tags}</span>
                     </div>`);
             });
@@ -1524,7 +1548,7 @@
                 <div class="project-spacer"></div>
                 <div class="project-footer">
                     <span>Updated 2026</span>
-                    <span>Design by Nik</span>
+                    <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en" target="_blank" rel="noopener">CC</a> BY-NC-ND Martin Wöllenstein</span>
                 </div>`);
 
             document.getElementById('projects-list').innerHTML = sections.map((s, i) => {
@@ -1532,7 +1556,7 @@
                     .sort((a, b) => TAG_ORDER.indexOf(a) - TAG_ORDER.indexOf(b))
                     .slice(0, 3);
                 const tagBlocks = tags.map(t =>
-                    `<span class="proj-tag-block" data-tag="${t}" style="background:${tagColors[t] || '#ccc'}"></span>`
+                    `<span class="proj-tag-block" data-tag="${t}" style="background:${tagColors[t] || 'transparent'}"></span>`
                 ).join('');
                 const num = String(sections.length - i).padStart(2, '0');
                 return `<div class="proj-row" data-index="${i}" onclick="openProject(${i})">
@@ -1866,6 +1890,7 @@
 
         init();
     </script>
+
 </body>
 
 </html>
