@@ -35,12 +35,12 @@
 
             --c-artwork: #e9fe53;
             --c-exhibition: #f8e589;
-            --c-research: #e6803c;
+            --c-research: #2961ee;
             --c-design: #db5626;
             --c-curating: #ae501f;
             --c-teaching: #673110;
-            --c-publication: #200e02;
-            --c-event: #0e1188;
+            --c-publication: #0e1188;
+            --c-event: #e6803c;
         }
 
         *,
@@ -110,6 +110,7 @@
 
         #col-2.open {
             width: 60%;
+
             overflow-y: auto;
         }
 
@@ -138,6 +139,16 @@
         /* about: project list hides, col-2 goes full width */
         #col-1.about {
             width: 0;
+        }
+
+        #about-header {
+            opacity: 0;
+            transition: opacity 0s 0.35s;
+        }
+
+        #col-2.about #about-header {
+            opacity: 1;
+            transition: opacity 0.2s ease 0.32s;
         }
 
         #col-2.about {
@@ -452,6 +463,8 @@
 
         .proj-name-text {
             display: block;
+            width: 100%;
+            min-width: 0;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -560,6 +573,17 @@
             display: flex;
             align-items: center;
             padding: 12px 25px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        #case-title span {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            min-width: 0;
         }
 
 
@@ -887,6 +911,7 @@
             justify-content: center;
             background: transparent;
             color: #000;
+            /* padding-right: 20px; */
         }
 
 
@@ -1017,6 +1042,51 @@
             body.dark .proj-row.active:hover { background: #fff; color: #000; }
         }
 
+        /* ── IPAD ── */
+        @media (min-width: 769px) and (max-width: 1100px) {
+            :root {
+                --size-ui: 20px;
+                --size-ui-md: 20px;
+                --size-ui-sm: 20px;
+                --size-label: 12px;
+                --size-body: 20px;
+                --bar-h: 44px;
+            }
+
+            #site-title {
+                width: 200px;
+                padding: 0 15px;
+            }
+
+            #header-about {
+                width: 100px;
+                padding: 0 15px;
+                margin-left: 10px;
+            }
+
+            .tag {
+                padding: 0 7px;
+            }
+
+            .proj-name,
+            .proj-location,
+            .proj-year {
+                padding: 0 15px;
+            }
+
+            .proj-tags {
+                padding-right: 15px;
+            }
+
+            .proj-name::before {
+                left: 15px;
+            }
+
+            .proj-row.active .proj-name {
+                padding-left: 44px;
+            }
+        }
+
         /* ── MOBILE ── */
         @media (max-width: 768px) {
             :root {
@@ -1057,7 +1127,7 @@
             }
 
             #header-about {
-                padding: 0 15px;
+                padding: 0 15px 0px 30px;
             }
 
             .about-back-btn {
@@ -1213,6 +1283,7 @@
                 padding: 0 15px;
                 display: flex;
                 align-items: center;
+                overflow: hidden;
             }
 
             .proj-row {
@@ -1753,7 +1824,11 @@
             document.querySelectorAll('.proj-row').forEach(r =>
                 r.classList.toggle('active', +r.dataset.index === i));
 
-            document.getElementById('case-title').textContent = sections[i].dataset.name;
+            const titleEl = document.getElementById('case-title');
+            titleEl.innerHTML = '';
+            const titleSpan = document.createElement('span');
+            titleSpan.textContent = sections[i].dataset.name;
+            titleEl.appendChild(titleSpan);
 
             sections.forEach(s => s.style.display = 'none');
             sections[i].style.display = 'block';
