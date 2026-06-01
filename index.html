@@ -660,10 +660,20 @@
         }
 
         .block-title {
+
             font-family: var(--font-ui);
             font-size: var(--size-label);
             font-variation-settings: var(--fv-ui);
             padding: 12px 25px 8px 0px;
+            /* border-top: 1px solid #000; */
+            letter-spacing: var(--ls-label);
+        }
+
+        .block-title-about {
+            font-family: var(--font-ui);
+            font-size: var(--size-label);
+            font-variation-settings: var(--fv-ui);
+            padding: 12px 25px 8px 25px;
             /* border-top: 1px solid #000; */
             letter-spacing: var(--ls-label);
         }
@@ -676,7 +686,7 @@
             border-top: none;
         }
 
-        #about-content .block-title:first-of-type {
+        #about-content .block-title-about:first-of-type {
             border-top: none;
         }
 
@@ -835,7 +845,7 @@
             min-width: 0;
         }
 
-        .about-col .block-title {
+        .about-col .block-title-about {
             border-top: none;
         }
 
@@ -917,7 +927,7 @@
             /* border-bottom: 1px solid #000; */
         }
 
-        #about-header+.block-title {
+        #about-header+.block-title-about {
             border-top: none;
         }
 
@@ -1012,56 +1022,138 @@
         body.dark #header-about {
             color: #fff;
         }
-    
+
 
 
         /* ── HOVER (pointer devices only) ── */
         @media (hover: hover) {
+
             .about-back-btn:hover,
             #header-about:hover,
             .about-cv-btn:hover {
                 font-variation-settings: var(--fv-ui_active);
                 letter-spacing: -0.0075em;
             }
+
             #site-title:hover span {
                 font-variation-settings: var(--fv-ui_active);
                 letter-spacing: -0.0075em;
             }
-            .tag[data-tag="Artwork"]:hover { background: var(--c-artwork); color: #000; }
-            .tag[data-tag="Exhibition"]:hover { background: var(--c-exhibition); color: #000; }
-            .tag[data-tag="Research"]:hover { background: var(--c-research); color: #fff; }
-            .tag[data-tag="Design"]:hover { background: var(--c-design); color: #fff; }
-            .tag[data-tag="Curating"]:hover { background: var(--c-curating); color: #fff; }
-            .tag[data-tag="Teaching"]:hover { background: var(--c-teaching); color: #fff; }
-            .tag[data-tag="Publication"]:hover { background: var(--c-publication); color: #fff; }
-            .tag[data-tag="Event"]:hover { background: var(--c-event); color: #fff; }
-            .tag:hover .tag-full { font-variation-settings: var(--fv-ui_active); }
+
+            .tag[data-tag="Artwork"]:hover {
+                background: var(--c-artwork);
+                color: #000;
+            }
+
+            .tag[data-tag="Exhibition"]:hover {
+                background: var(--c-exhibition);
+                color: #000;
+            }
+
+            .tag[data-tag="Research"]:hover {
+                background: var(--c-research);
+                color: #fff;
+            }
+
+            .tag[data-tag="Design"]:hover {
+                background: var(--c-design);
+                color: #fff;
+            }
+
+            .tag[data-tag="Curating"]:hover {
+                background: var(--c-curating);
+                color: #fff;
+            }
+
+            .tag[data-tag="Teaching"]:hover {
+                background: var(--c-teaching);
+                color: #fff;
+            }
+
+            .tag[data-tag="Publication"]:hover {
+                background: var(--c-publication);
+                color: #fff;
+            }
+
+            .tag[data-tag="Event"]:hover {
+                background: var(--c-event);
+                color: #fff;
+            }
+
+            .tag:hover .tag-full {
+                font-variation-settings: var(--fv-ui_active);
+            }
+
             .proj-row:hover .proj-name,
             .proj-row:hover .proj-location,
             .proj-row:hover .proj-year {
                 font-variation-settings: var(--fv-ui_active);
                 letter-spacing: -0.0075em;
             }
+
             .proj-row:hover .proj-location,
-            .proj-row:hover .proj-year { transform: translateX(25px); }
-            .proj-row.active:hover { background: #000; }
+            .proj-row:hover .proj-year {
+                transform: translateX(25px);
+            }
+
+            .proj-row.active:hover {
+                background: #000;
+            }
+
             .proj-row.active:hover .proj-location,
-            .proj-row.active:hover .proj-year { transform: none; }
-            .proj-row:hover .proj-name { padding-left: 49px; }
-            .proj-row:hover .proj-name::before { opacity: 1; }
-            .proj-row:hover .proj-tag-block { width: 13px; }
-            .proj-row.active:hover .proj-tag-block { width: 26px; }
+            .proj-row.active:hover .proj-year {
+                transform: none;
+            }
+
+            .proj-row:hover .proj-name {
+                padding-left: 49px;
+            }
+
+            .proj-row:hover .proj-name::before {
+                opacity: 1;
+            }
+
+            .proj-row:hover .proj-tag-block {
+                width: 13px;
+            }
+
+            .proj-row.active:hover .proj-tag-block {
+                width: 26px;
+            }
+
             .case-filter:hover {
                 font-variation-settings: var(--fv-ui_active);
                 background: #000;
                 color: #fff;
             }
-            .about-links a:hover { padding-left: 18px; }
-            .about-links a:hover::before { opacity: 1; }
-            #dark-mode-btn:hover { background: #000; color: #fff; }
-            body.dark .case-filter:hover { background: #fff; color: #000; }
-            body.dark #dark-mode-btn:hover { background: #fff; color: #000; }
-            body.dark .proj-row.active:hover { background: #fff; color: #000; }
+
+            .about-links a:hover {
+                padding-left: 18px;
+            }
+
+            .about-links a:hover::before {
+                opacity: 1;
+            }
+
+            #dark-mode-btn:hover {
+                background: #000;
+                color: #fff;
+            }
+
+            body.dark .case-filter:hover {
+                background: #fff;
+                color: #000;
+            }
+
+            body.dark #dark-mode-btn:hover {
+                background: #fff;
+                color: #000;
+            }
+
+            body.dark .proj-row.active:hover {
+                background: #fff;
+                color: #000;
+            }
         }
 
         /* ── IPAD ── */
@@ -1228,10 +1320,25 @@
 
             /* Keep mobile layout during the open transition — override desktop narrow-panel styles */
             #col-1.open .tag-full,
-            #col-1.open .tag-bold-ghost { display: revert; }
-            #col-1.open .tag-short { display: none; }
-            #col-1.open #filters .tag { flex: 0 0 25%; padding: 0 10px; }
-            #col-1.open #site-title { width: auto; flex-shrink: 1; padding: 0 15px; }
+            #col-1.open .tag-bold-ghost {
+                display: revert;
+            }
+
+            #col-1.open .tag-short {
+                display: none;
+            }
+
+            #col-1.open #filters .tag {
+                flex: 0 0 25%;
+                padding: 0 10px;
+            }
+
+            #col-1.open #site-title {
+                width: auto;
+                flex-shrink: 1;
+                padding: 0 15px;
+            }
+
             #col-1.open #filters {
                 flex: unset;
                 min-width: unset;
@@ -1239,8 +1346,15 @@
                 transform: none;
                 pointer-events: auto;
             }
-            #col-1.open .proj-row { grid-template-columns: 50% 25% 15% 10%; }
-            #col-1.open .proj-tags { padding-right: 15px; }
+
+            #col-1.open .proj-row {
+                grid-template-columns: 50% 25% 15% 10%;
+            }
+
+            #col-1.open .proj-tags {
+                padding-right: 15px;
+            }
+
             #col-1.open .proj-location,
             #col-1.open .proj-year {
                 opacity: 1;
@@ -1357,36 +1471,41 @@
                 margin: 0 15px 0px 15px;
             }
 
-            .about-body{
+            .about-body {
                 padding: 0 15px 15px 15px;
             }
 
-            .about-exhibitions{
+            .about-exhibitions {
                 padding: 0 15px 15px 15px;
             }
 
-            .about-links{
-                 padding: 0 15px 15px 15px;
+            .about-links {
+                padding: 0 15px 15px 15px;
             }
 
-            .about-col .block-title{
+            .about-col .block-title-about {
                 padding: 10px 15px 6px 15px;
             }
 
-            .about-cv-btn{
+            .about-cv-btn {
                 padding: 0 15px;
             }
 
-            .project-footer{
-                    padding: 0 15px;
+            .project-footer {
+                padding: 0 15px;
             }
 
             .block-images {
                 padding: 0px 15px 0px 15px;
             }
 
-            .images-row .img-wrap ~ .img-wrap {
+            .images-row .img-wrap~.img-wrap {
                 display: none;
+            }
+
+            .about-list {
+
+                padding: 10px 15px 6px 15px;
             }
 
 
@@ -1441,9 +1560,10 @@
                 </div>
                 <div id="projects-list"></div>
                 <div class="project-footer" style="margin-top:0; border-top:none">
-                    
-                    <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en" target="_blank" rel="noopener">CC</a> BY-NC-ND Martin Wöllenstein</span>
-                    <span>Updated 2026</span>
+
+                    <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en" target="_blank"
+                            rel="noopener">CC</a> BY-NC-ND Martin Wöllenstein</span>
+                    <span>Design & development by <a href="https://niksarchive.com" target="_blank" rel="noopener">Nik</a></span>
                 </div>
             </div>
         </div>
@@ -1526,7 +1646,7 @@
         }
 
         function renderAboutCol(block) {
-            const title = block.title ? `<div class="block-title">${block.title}</div>` : '';
+            const title = block.title ? `<div class="block-title-about">${block.title}</div>` : '';
 
             if (block._type === 'textBlock') {
                 const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
