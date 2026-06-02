@@ -1704,18 +1704,22 @@
 
         function renderBlock(block) {
             if (block._type === 'textBlock') {
-                const paras = (block.body || '').split('\n').filter(l => l.trim())
+                const text = block.body || block.content || '';
+                const paras = text.split(/\\n|\n/).filter(l => l.trim())
                     .map(l => `<p>${l}</p>`).join('');
+                const label = block.blockTitle || block.description;
                 return `<div class="block block-text" data-type="text">
-                    ${block.description ? `<div class="block-description">${block.description}</div>` : ''}
+                    ${label ? `<div class="block-description">${label}</div>` : ''}
                     <div class="block-body">${paras}</div>
                 </div>`;
             }
             if (block._type === 'creditsBlock') {
-                const items = (block.body || '').split('\n').filter(l => l.trim())
+                const text = block.body || block.content || '';
+                const items = text.split(/\\n|\n/).filter(l => l.trim())
                     .map(l => `<span>${l}</span>`).join('');
+                const label = block.blockTitle || block.description;
                 return `<div class="block block-credits" data-type="credits">
-                    ${block.description ? `<div class="block-description">${block.description}</div>` : ''}
+                    ${label ? `<div class="block-description">${label}</div>` : ''}
                     <div class="block-body">${items}</div>
                 </div>`;
             }
