@@ -823,6 +823,18 @@
             padding: 0 25px 25px 25px;
         }
 
+        .load-error {
+            font-family: var(--font-body);
+            font-size: var(--size-body);
+            line-height: 1.4;
+            padding: 25px;
+            opacity: 0.7;
+        }
+
+        .load-error a {
+            text-decoration: underline;
+        }
+
         .about-body p {
             margin-bottom: 16px;
         }
@@ -1623,7 +1635,6 @@
     <script>
         const SANITY_PROJECT_ID = '1uk7glr5';
         const SANITY_DATASET = 'production';
-        const SANITY_TOKEN = 'skJgM39jVueFEVB1dFkXRgceCeFogPCuGtrXD9O69qrRhTdho5kHHHcOO0mX1hh1p5N1yDa6hklDWTMzWmefVheY2hfZzVE5X2U6gF4eIetu57fiQZ9yzAGmNpd7PqZuQZCG5xceIC6wqIEgmDnbYkVa3ZWWrb5PTDDZNzp1Y9Hf189YWwu2';
 
         const TAG_ORDER = ['Artwork', 'Exhibition', 'Research', 'Design', 'Curating', 'Teaching', 'Publication', 'Event'];
         const tagColors = {
@@ -1652,12 +1663,31 @@
             return `https://cdn.sanity.io/files/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${ref.replace('file-', '').replace(/-(\w+)$/, '.$1')}`;
         }
 
+        /* Retries transient network/API failures a few times before giving up,
+           so a single dropped request doesn't leave the page blank. */
+        async function sanityFetch(query, { retries = 2, timeoutMs = 8000 } = {}) {
+            const url = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2021-10-21/data/query/${SANITY_DATASET}?query=${encodeURIComponent(query)}`;
+            for (let attempt = 0; ; attempt++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const res = await fetch(url, {
+                        signal: controller.signal
+                    });
+                    if (!res.ok) throw new Error(`Sanity request failed: ${res.status}`);
+                    const data = await res.json();
+                    return data.result;
+                } catch (err) {
+                    if (attempt >= retries) throw err;
+                    await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+                } finally {
+                    clearTimeout(timer);
+                }
+            }
+        }
+
         async function fetchAbout() {
-            const query = encodeURIComponent('*[_type == "about"][0]');
-            const url = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${SANITY_DATASET}?query=${query}`;
-            const res = await fetch(url, { headers: { Authorization: `Bearer ${SANITY_TOKEN}` } });
-            const data = await res.json();
-            return data.result;
+            return sanityFetch('*[_type == "about"][0]');
         }
 
         function renderAboutCol(block) {
@@ -1710,11 +1740,7 @@
         }
 
         async function fetchProjects() {
-            const query = encodeURIComponent('*[_type == "project"] | order(year desc)');
-            const url = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${SANITY_DATASET}?query=${query}`;
-            const res = await fetch(url, { headers: { Authorization: `Bearer ${SANITY_TOKEN}` } });
-            const data = await res.json();
-            return data.result;
+            return sanityFetch('*[_type == "project"] | order(year desc)');
         }
 
         function renderBlock(block) {
@@ -1761,7 +1787,18 @@
 
         /* ── INIT: fetch from Sanity, render, then set up sidebar ── */
         async function init() {
-            const projects = await fetchProjects();
+            let projects;
+            try {
+                projects = await fetchProjects();
+            } catch (err) {
+                console.error('Failed to load projects from Sanity:', err);
+                document.getElementById('projects-list').innerHTML = `
+                    <div class="load-error">
+                        Couldn't load the content. Please check your connection and
+                        <a href="#" onclick="location.reload(); return false;">try again</a>.
+                    </div>`;
+                return;
+            }
             const content = document.getElementById('projects-content');
 
             projects.forEach(p => {
@@ -2039,7 +2076,15 @@
             document.getElementById('case-topbar').style.display = 'none';
             document.getElementById('header-about').style.display = 'none';
             document.getElementById('case-empty').style.display = 'block';
-            fetchAbout().then(populateAbout);
+            fetchAbout().then(populateAbout).catch(err => {
+                console.error('Failed to load about content from Sanity:', err);
+                const grid = document.querySelector('.about-grid');
+                if (grid) grid.innerHTML = `
+                    <div class="load-error">
+                        Couldn't load this page. Please check your connection and
+                        <a href="#" onclick="location.reload(); return false;">try again</a>.
+                    </div>`;
+            });
             if (!_panelOpen) { history.pushState(null, ''); _panelOpen = true; }
         }
 
