@@ -728,7 +728,8 @@
             font-size: var(--size-body);
             font-variation-settings: var(--fv-body);
             line-height: 1.2;
-            padding: 0 75px 25px 25px;
+            padding: 0 25px 25px 25px;
+            width: 85%;
         }
 
         .block-text .block-body p {
@@ -911,6 +912,15 @@
             position: relative;
             padding-left: 0;
             transition: padding-left 0.1s ease;
+        }
+
+        .block-body a,
+        .about-body a,
+        .about-list a {
+            color: inherit;
+            font-style: italic;
+            text-decoration: none;
+            transition: font-variation-settings 0.15s ease;
         }
 
         .about-links a::before {
@@ -1154,6 +1164,12 @@
 
             .about-links a:hover {
                 padding-left: 18px;
+            }
+
+            .block-body a:hover,
+            .about-body a:hover,
+            .about-list a:hover {
+                text-decoration: underline;
             }
 
             .about-links a:hover::before {
@@ -1528,6 +1544,18 @@
                 display: none;
             }
 
+            .images-row .img-wrap {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+
+            .images-row .img-wrap img {
+                width: 100%;
+                height: auto;
+                max-width: 100%;
+                display: block;
+            }
+
             .about-list {
 
                 padding: 10px 15px 6px 15px;
@@ -1650,6 +1678,24 @@
             document.body.classList.toggle('dark');
         }
 
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        /* Turns bare URLs typed into plain-text content into clickable links,
+           so Martin can just paste a link into the text without any markup. */
+        function linkify(text) {
+            return text.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, (match) => {
+                let trail = '';
+                while (/[.,;:!?)\]]$/.test(match)) {
+                    trail = match.slice(-1) + trail;
+                    match = match.slice(0, -1);
+                }
+                const href = match.toLowerCase().startsWith('www.') ? `https://${match}` : match;
+                return `<a href="${href}" target="_blank" rel="noopener">${match}</a>${trail}`;
+            });
+        }
+
         // SANITY
         function sanityImageUrl(ref) {
             return `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${ref.replace('image-', '').replace(/-(\w+)$/, '.$1')}`;
@@ -1690,7 +1736,7 @@
             const title = block.title ? `<div class="block-title-about">${block.title}</div>` : '';
 
             if (block._type === 'textBlock') {
-                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${linkify(escapeHtml(l))}</p>`).join('');
                 return `<div class="about-col">${title}<div class="about-body">${paras}</div></div>`;
             }
 
@@ -1701,7 +1747,7 @@
             }
 
             if (block._type === 'listBlock') {
-                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                const paras = (block.content || '').split('\n').filter(l => l.trim()).map(l => `<p>${linkify(escapeHtml(l))}</p>`).join('');
                 return `<div class="about-col">${title}<div class="about-list">${paras}</div></div>`;
             }
 
@@ -1743,7 +1789,7 @@
             if (block._type === 'textBlock') {
                 const text = block.body || block.content || '';
                 const paras = text.split(/\\n|\n/).filter(l => l.trim())
-                    .map(l => `<p>${l}</p>`).join('');
+                    .map(l => `<p>${linkify(escapeHtml(l))}</p>`).join('');
                 const label = block.blockTitle || block.description;
                 return `<div class="block block-text" data-type="text">
                     ${label ? `<div class="block-description">${label}</div>` : ''}
@@ -1753,7 +1799,7 @@
             if (block._type === 'creditsBlock') {
                 const text = block.body || block.content || '';
                 const items = text.split(/\\n|\n/).filter(l => l.trim())
-                    .map(l => `<span>${l}</span>`).join('');
+                    .map(l => `<span>${linkify(escapeHtml(l))}</span>`).join('');
                 const label = block.blockTitle || block.description;
                 return `<div class="block block-credits" data-type="credits">
                     ${label ? `<div class="block-description">${label}</div>` : ''}
