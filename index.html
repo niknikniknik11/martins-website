@@ -923,6 +923,12 @@
             transition: font-variation-settings 0.15s ease;
         }
 
+        .block-body p,
+        .about-body p,
+        .about-list p {
+            overflow-wrap: break-word;
+        }
+
         .about-links a::before {
             content: '';
             position: absolute;
@@ -1683,16 +1689,20 @@
         }
 
         /* Turns bare URLs typed into plain-text content into clickable links,
-           so Martin can just paste a link into the text without any markup. */
+           so Martin can just paste a link into the text without any markup.
+           The visible label drops the http(s):// prefix to stay readable;
+           overflow-wrap on the paragraph handles long domains/paths wrapping. */
         function linkify(text) {
             return text.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, (match) => {
+                let url = match;
                 let trail = '';
-                while (/[.,;:!?)\]]$/.test(match)) {
-                    trail = match.slice(-1) + trail;
-                    match = match.slice(0, -1);
+                while (/[.,;:!?)\]]$/.test(url)) {
+                    trail = url.slice(-1) + trail;
+                    url = url.slice(0, -1);
                 }
-                const href = match.toLowerCase().startsWith('www.') ? `https://${match}` : match;
-                return `<a href="${href}" target="_blank" rel="noopener">${match}</a>${trail}`;
+                const href = url.toLowerCase().startsWith('www.') ? `https://${url}` : url;
+                const label = url.replace(/^https?:\/\//i, '');
+                return `<a href="${href}" target="_blank" rel="noopener">${label}</a>${trail}`;
             });
         }
 
